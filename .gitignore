@@ -1,0 +1,70 @@
+# === Dependencies ===
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+.Python
+env/
+venv/
+.venv/
+
+# === Build outputs ===
+.next/
+out/
+build/
+dist/
+*.egg-info/
+
+# === Environment ===
+.env
+.env.local
+.env.*.local
+!.env.example
+!.env.local.example
+!frontend/.env.local.example
+!backend/.env.example
+
+# === IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# === Docker data ===
+.docker-data/
+
+# === Python ===
+*.egg
+pip-log.txt
+pip-delete-this-directory.txt
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+.ruff_cache/
+
+# === Next.js ===
+.vercel
+
+# === TypeScript ===
+*.tsbuildinfo
+next-env.d.ts
+
+# === Supabase ===
+supabase/.temp/
+
+# === Misc ===
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

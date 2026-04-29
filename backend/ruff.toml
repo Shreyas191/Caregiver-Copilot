@@ -1,0 +1,8 @@
+line-length = 100
+
+[lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "A", "SIM"]
+ignore = []
+
+[lint.isort]
+known-first-party = ["app"]
