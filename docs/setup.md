@@ -51,3 +51,29 @@ docker compose stop qdrant
 docker compose down -v
 ```
 Or manually delete the `.docker-data/qdrant` directory.
+
+---
+
+## Ollama (Local LLMs) Setup
+
+We use Ollama to run the required models locally.
+
+**To install Ollama on macOS:**
+```bash
+brew install ollama
+brew services start ollama
+```
+
+**Required Models & Substitutions:**
+- Embedding Model: `bge-m3`
+- Router Chat Model: `qwen2.5:7b` (Substituted for `qwen3:8b` as Qwen3 is not available on Ollama registry yet)
+- Generator Chat Model: `glm4` (Substituted for `glm-4.5-air` as exact tag is not available)
+- Verifier Chat Model: `qwen2.5:32b` (Substituted for `qwen3:30b-a3b` as exact tag is not available)
+
+**To pull the models:**
+```bash
+ollama pull bge-m3
+ollama pull qwen2.5:7b
+ollama pull glm4
+ollama pull qwen2.5:32b
+```
