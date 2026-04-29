@@ -3,7 +3,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes import health, me
+from app.routes import health, me, care_recipients
 
 app = FastAPI(
     title="Caregiver Co-Pilot API",
@@ -23,3 +23,4 @@ app.add_middleware(
 # Register routes
 app.include_router(health.router)
 app.include_router(me.router)
+app.include_router(care_recipients.router, prefix="/api/v1")
