@@ -3,22 +3,23 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes.health import router as health_router
+from app.routes import health, me
 
 app = FastAPI(
     title="Caregiver Co-Pilot API",
-    description="Backend API for the Caregiver Co-Pilot agentic assistant.",
+    description="Backend API for the Caregiver Co-Pilot application",
     version="0.1.0",
 )
 
-# --- CORS ---
+# CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],  # Restrict this in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# --- Routers ---
-app.include_router(health_router)
+# Register routes
+app.include_router(health.router)
+app.include_router(me.router)
