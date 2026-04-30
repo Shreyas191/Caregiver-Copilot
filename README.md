@@ -151,26 +151,6 @@ pytest app/tests/ -v
 | `NEXT_PUBLIC_API_URL` | ✅ | Backend URL (e.g., `http://localhost:8000`) |
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | ✅ | Clerk frontend key |
 
-## 📋 Implemented Tasks
-
-| Task | Description | Status |
-|------|-------------|--------|
-| CC-001 | Next.js frontend setup | ✅ |
-| CC-002 | FastAPI backend foundation | ✅ |
-| CC-003 | Supabase schema & migrations | ✅ |
-| CC-004 | Clerk authentication integration | ✅ |
-| CC-005 | ORM models for all tables | ✅ |
-| CC-006 | Care recipient CRUD endpoints | ✅ |
-| CC-007 | Care recipient onboarding form | ✅ |
-| CC-008–011 | Schema refinements & validation | ✅ |
-| CC-012 | Medication autocomplete (RxNav) | ✅ |
-| CC-013 | Dashboard & profile pages | ✅ |
-| CC-014 | Chat UI with SSE streaming | ✅ |
-| CC-015 | Ollama/OpenAI provider abstraction | ✅ |
-| CC-016 | Context-reading agent tools | ✅ |
-| CC-017 | Write tools (log_vital, log_episode) | ✅ |
-| CC-018 | v0 Agent loop (GLM-4.5-Air) | ✅ |
-
 ## 📄 License
 
 This project is for educational and research purposes.
