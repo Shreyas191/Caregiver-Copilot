@@ -13,8 +13,16 @@ settings = get_settings()
 if not settings.database_url:
     raise ValueError("DATABASE_URL is not set in the environment.")
 
-# Create the async engine
-engine = create_async_engine(settings.database_url, echo=False, future=True)
+# Create the async engine with pgBouncer support
+engine = create_async_engine(
+    settings.database_url,
+    echo=False,
+    future=True,
+    connect_args={
+        "prepared_statement_cache_size": 0,
+        "statement_cache_size": 0,
+    },
+)
 
 # Create the async session factory
 async_session_maker = async_sessionmaker(
@@ -56,4 +64,9 @@ async def get_db(request: Request) -> AsyncGenerator[AsyncSession, None]:
                 # The security dependency will catch and raise the 401 later.
                 pass
         
-        yield session
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise

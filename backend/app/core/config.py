@@ -29,17 +29,30 @@ class Settings(BaseSettings):
     qdrant_api_key: str | None = None
 
     # --- LLM ---
-    ollama_base_url: str = "http://localhost:11434"
+    ollama_base_url: str = "http://localhost:11434"  # kept for legacy scripts
 
-    # --- Model selection ---
-    router_model_provider: str = "ollama"
-    router_model_name: str = "qwen3:8b"
-    generator_model_provider: str = "ollama"
-    generator_model_name: str = "glm-4.5-air"
-    verifier_model_provider: str = "ollama"
-    verifier_model_name: str = "qwen3:30b-a3b"
-    embedding_model_provider: str = "ollama"
-    embedding_model_name: str = "bge-m3"
+    # --- Per-role model config ---
+    # Each role has: BASE_URL (OpenAI-compatible endpoint), API_KEY, MODEL_NAME
+
+    # Router: fast intent classifier — local Ollama
+    router_base_url: str = "http://localhost:11434/v1"
+    router_api_key: str = "ollama"
+    router_model_name: str = "qwen2.5:7b"
+
+    # Generator: agentic tool-use model — GLM-4.5-Air via OpenRouter free tier
+    generator_base_url: str = "https://openrouter.ai/api/v1"
+    generator_api_key: str = ""
+    generator_model_name: str = "z-ai/glm-4.5-air:free"
+
+    # Verifier: structured judgment — Llama-3.3-70B via OpenRouter free tier
+    verifier_base_url: str = "https://openrouter.ai/api/v1"
+    verifier_api_key: str = ""
+    verifier_model_name: str = "meta-llama/llama-3.3-70b-instruct:free"
+
+    # Embeddings: BGE-M3 dense vectors — local Ollama
+    embedding_base_url: str = "http://localhost:11434/v1"
+    embedding_api_key: str = "ollama"
+    embedding_model_name: str = "bge-m3:latest"
 
     # --- External APIs ---
     rxnav_base_url: str = "https://rxnav.nlm.nih.gov/REST"

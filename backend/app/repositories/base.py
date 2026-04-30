@@ -23,21 +23,23 @@ class BaseRepository(Generic[ModelType]):
     async def create(self, **kwargs: Any) -> ModelType:
         obj = self.model(**kwargs)
         self.db.add(obj)
-        await self.db.commit()
+        await self.db.flush()
         await self.db.refresh(obj)
         return obj
 
-    async def update(self, db_obj: ModelType, **kwargs: Any) -> ModelType:
-        for key, value in kwargs.items():
-            setattr(db_obj, key, value)
-        await self.db.commit()
-        await self.db.refresh(db_obj)
-        return db_obj
+    async def update(self, id: uuid.UUID, **kwargs) -> ModelType | None:
+        obj = await self.get(id)
+        if obj:
+            for key, value in kwargs.items():
+                setattr(obj, key, value)
+            await self.db.flush()
+            await self.db.refresh(obj)
+        return obj
 
     async def delete(self, id: uuid.UUID) -> bool:
         obj = await self.get(id)
         if obj:
             await self.db.delete(obj)
-            await self.db.commit()
+            await self.db.flush()
             return True
         return False

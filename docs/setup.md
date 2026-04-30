@@ -54,26 +54,56 @@ Or manually delete the `.docker-data/qdrant` directory.
 
 ---
 
-## Ollama (Local LLMs) Setup
+## LLM Setup: Ollama (local) + OpenRouter (cloud free tier)
 
-We use Ollama to run the required models locally.
+The system uses a transport-agnostic `OpenAICompatibleProvider` for all model roles.
+Each role has its own `BASE_URL`, `API_KEY`, and `MODEL_NAME` in `.env`.
 
-**To install Ollama on macOS:**
+### Role assignments
+
+| Role | Model | Provider | Notes |
+|---|---|---|---|
+| Router | `qwen2.5:7b` | Local Ollama | Fast intent classification |
+| Generator | `z-ai/glm-4.5-air:free` | OpenRouter | Agentic tool-use; GLM native tool-calling |
+| Verifier | `meta-llama/llama-3.3-70b-instruct:free` | OpenRouter | Strong structured judgment |
+| Embeddings | `bge-m3:latest` | Local Ollama | 1024-dim dense vectors |
+
+### Why not run all models locally?
+
+- **GLM-4.5-Air on Ollama (`glm4:latest`) does not support tool calling** via the OpenAI-compatible
+  endpoint (returns 400). OpenRouter serves the model with correct native tool-call handling.
+- **Running a 70B verifier locally** requires ~40 GB VRAM, not available on most dev machines.
+  Llama-3.3-70B via OpenRouter is free, fast, and stronger for judgment tasks.
+
+### Local Ollama setup
+
+Install Ollama and pull only the two local models:
+
 ```bash
 brew install ollama
 brew services start ollama
+
+ollama pull qwen2.5:7b    # router
+ollama pull bge-m3:latest # embeddings
 ```
 
-**Required Models & Substitutions:**
-- Embedding Model: `bge-m3`
-- Router Chat Model: `qwen2.5:7b` (Substituted for `qwen3:8b` as Qwen3 is not available on Ollama registry yet)
-- Generator Chat Model: `glm4` (Substituted for `glm-4.5-air` as exact tag is not available)
-- Verifier Chat Model: `qwen2.5:32b` (Substituted for `qwen3:30b-a3b` as exact tag is not available)
+You do **not** need to pull glm4 or qwen2.5:32b.
 
-**To pull the models:**
-```bash
-ollama pull bge-m3
-ollama pull qwen2.5:7b
-ollama pull glm4
-ollama pull qwen2.5:32b
+### OpenRouter setup
+
+1. Sign up at https://openrouter.ai (free, no credit card required).
+2. Create an API key.
+3. Add to `.env`:
+
+```env
+GENERATOR_API_KEY=sk-or-...
+VERIFIER_API_KEY=sk-or-...   # can be the same key
 ```
+
+**OpenRouter free-tier limits (approximate):**
+- ~20 requests/minute
+- ~200 messages/day (varies by model and account age)
+- No cost for `:free` model variants
+
+The backend implements automatic retry on 429 (rate limit) with a 2-second delay.
+If you hit daily limits during development, wait until the next UTC day or upgrade your account.

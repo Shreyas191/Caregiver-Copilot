@@ -2,7 +2,7 @@ import uuid
 from datetime import date, datetime
 from typing import Any
 
-from sqlalchemy import Date, ForeignKey, String
+from sqlalchemy import Date, ForeignKey, String, func
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -38,5 +38,5 @@ class CareRecipient(Base, IDMixin, TimestampMixin):
     consent_basis: Mapped[ConsentBasis] = mapped_column(
         ENUM(ConsentBasis, name="consent_basis", create_type=False), nullable=False
     )
-    consent_documented_at: Mapped[datetime] = mapped_column(nullable=False)
+    consent_documented_at: Mapped[datetime] = mapped_column(nullable=False, server_default=func.now())
     consent_revoked_at: Mapped[datetime | None] = mapped_column(nullable=True)

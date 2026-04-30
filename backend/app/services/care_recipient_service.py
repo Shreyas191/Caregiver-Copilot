@@ -33,7 +33,7 @@ class CareRecipientService:
                 timezone="America/New_York",
             )
             self.db.add(caregiver)
-            await self.db.commit()
+            await self.db.flush()
             await self.db.refresh(caregiver)
 
         return caregiver

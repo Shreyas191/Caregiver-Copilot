@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/v1';
 
 export async function fetchWithAuth(
   endpoint: string,
@@ -46,6 +46,15 @@ export const api = {
     },
     get: async (token: string, id: string) => {
       return fetchWithAuth(`/care-recipients/${id}`, token);
+    },
+    vitals: async (token: string, id: string, limit = 10) => {
+      return fetchWithAuth(`/care-recipients/${id}/vitals?limit=${limit}`, token);
+    },
+    episodes: async (token: string, id: string, limit = 5) => {
+      return fetchWithAuth(`/care-recipients/${id}/episodes?limit=${limit}`, token);
+    },
+    medications: async (token: string, id: string) => {
+      return fetchWithAuth(`/care-recipients/${id}/medications`, token);
     },
   },
 };

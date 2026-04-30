@@ -147,15 +147,15 @@ export default function OnboardingForm() {
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto border-gray-800 bg-gray-950/50 backdrop-blur">
+    <Card className="w-full max-w-2xl mx-auto border-gray-200 bg-white shadow-sm">
       <CardHeader>
-        <CardTitle className="text-2xl font-semibold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
+        <CardTitle className="text-2xl font-semibold text-gray-900">
           Add Care Recipient
         </CardTitle>
-        <CardDescription>Step {step} of 5</CardDescription>
-        <div className="w-full h-1 bg-gray-800 rounded-full mt-4">
+        <CardDescription className="text-gray-500">Step {step} of 5</CardDescription>
+        <div className="w-full h-1 bg-gray-100 rounded-full mt-4">
           <div 
-            className="h-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-300"
+            className="h-1 bg-blue-600 rounded-full transition-all duration-300"
             style={{ width: `${(step / 5) * 100}%` }}
           />
         </div>
@@ -171,9 +171,9 @@ export default function OnboardingForm() {
                   name="display_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name *</FormLabel>
+                      <FormLabel className="text-gray-700">Full Name *</FormLabel>
                       <FormControl>
-                        <Input placeholder="John Doe" className="bg-gray-900 border-gray-800" {...field} />
+                        <Input placeholder="John Doe" className="bg-white border-gray-300" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -184,9 +184,9 @@ export default function OnboardingForm() {
                   name="date_of_birth"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Date of Birth *</FormLabel>
+                      <FormLabel className="text-gray-700">Date of Birth *</FormLabel>
                       <FormControl>
-                        <Input type="date" className="bg-gray-900 border-gray-800" {...field} />
+                        <Input type="date" className="bg-white border-gray-300" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -197,10 +197,10 @@ export default function OnboardingForm() {
                   name="sex_at_birth"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Sex at Birth *</FormLabel>
+                      <FormLabel className="text-gray-700">Sex at Birth *</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="bg-gray-900 border-gray-800">
+                          <SelectTrigger className="bg-white border-gray-300">
                             <SelectValue placeholder="Select sex at birth" />
                           </SelectTrigger>
                         </FormControl>
@@ -222,20 +222,20 @@ export default function OnboardingForm() {
             <div className={step === 2 ? 'block animate-in fade-in slide-in-from-right-4 duration-300' : 'hidden'}>
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-lg font-medium text-gray-200 mb-1">Medical Conditions</h3>
-                  <p className="text-sm text-gray-400 mb-4">Add known medical conditions, chronic illnesses, or recent diagnoses.</p>
+                  <h3 className="text-lg font-medium text-gray-900 mb-1">Medical Conditions</h3>
+                  <p className="text-sm text-gray-500 mb-4">Add known medical conditions, chronic illnesses, or recent diagnoses.</p>
                 </div>
                 {conditionFields.map((field, index) => (
-                  <div key={field.id} className="flex gap-4 items-end border border-gray-800 bg-gray-900/50 p-4 rounded-md">
+                  <div key={field.id} className="flex gap-4 items-end border border-gray-200 bg-gray-50 p-4 rounded-md">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
                       <FormField
                         control={form.control}
                         name={`conditions.${index}.name`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-xs">Condition Name *</FormLabel>
+                            <FormLabel className="text-xs text-gray-700">Condition Name *</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g., Type 2 Diabetes" className="bg-gray-950 border-gray-800" {...field} />
+                              <Input placeholder="e.g., Type 2 Diabetes" className="bg-white border-gray-300" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -246,9 +246,9 @@ export default function OnboardingForm() {
                         name={`conditions.${index}.icd10_code`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-xs">ICD-10 (Optional)</FormLabel>
+                            <FormLabel className="text-xs text-gray-700">ICD-10 (Optional)</FormLabel>
                             <FormControl>
-                              <Input placeholder="E11.9" className="bg-gray-950 border-gray-800" {...field} />
+                              <Input placeholder="E11.9" className="bg-white border-gray-300" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -259,16 +259,16 @@ export default function OnboardingForm() {
                         name={`conditions.${index}.diagnosed_date`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-xs">Diagnosed (Optional)</FormLabel>
+                            <FormLabel className="text-xs text-gray-700">Diagnosed (Optional)</FormLabel>
                             <FormControl>
-                              <Input placeholder="YYYY or YYYY-MM" className="bg-gray-950 border-gray-800" {...field} />
+                              <Input placeholder="YYYY or YYYY-MM" className="bg-white border-gray-300" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
-                    <Button type="button" variant="ghost" size="icon" onClick={() => removeCondition(index)} className="hover:bg-red-500/20 hover:text-red-400 text-gray-500">
+                    <Button type="button" variant="ghost" size="icon" onClick={() => removeCondition(index)} className="hover:bg-red-50 hover:text-red-600 text-gray-400">
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -277,7 +277,7 @@ export default function OnboardingForm() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="border-gray-800 bg-transparent hover:bg-gray-800 text-blue-400 border-dashed w-full py-6"
+                  className="border-gray-300 bg-white hover:bg-gray-50 text-blue-600 border-dashed w-full py-6"
                   onClick={() => appendCondition({ name: '', icd10_code: '', diagnosed_date: '' })}
                 >
                   <Plus className="h-4 w-4 mr-2" /> Add Condition
@@ -289,20 +289,20 @@ export default function OnboardingForm() {
             <div className={step === 3 ? 'block animate-in fade-in slide-in-from-right-4 duration-300' : 'hidden'}>
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-lg font-medium text-gray-200 mb-1">Allergies</h3>
-                  <p className="text-sm text-gray-400 mb-4">Add known allergies to medications, food, or environment.</p>
+                  <h3 className="text-lg font-medium text-gray-900 mb-1">Allergies</h3>
+                  <p className="text-sm text-gray-500 mb-4">Add known allergies to medications, food, or environment.</p>
                 </div>
                 {allergyFields.map((field, index) => (
-                  <div key={field.id} className="flex gap-4 items-end border border-gray-800 bg-gray-900/50 p-4 rounded-md">
+                  <div key={field.id} className="flex gap-4 items-end border border-gray-200 bg-gray-50 p-4 rounded-md">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
                       <FormField
                         control={form.control}
                         name={`allergies.${index}.substance`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-xs">Substance *</FormLabel>
+                            <FormLabel className="text-xs text-gray-700">Substance *</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g., Penicillin" className="bg-gray-950 border-gray-800" {...field} />
+                              <Input placeholder="e.g., Penicillin" className="bg-white border-gray-300" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -313,9 +313,9 @@ export default function OnboardingForm() {
                         name={`allergies.${index}.reaction`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-xs">Reaction</FormLabel>
+                            <FormLabel className="text-xs text-gray-700">Reaction</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g., Hives" className="bg-gray-950 border-gray-800" {...field} />
+                              <Input placeholder="e.g., Hives" className="bg-white border-gray-300" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -326,16 +326,16 @@ export default function OnboardingForm() {
                         name={`allergies.${index}.severity`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-xs">Severity</FormLabel>
+                            <FormLabel className="text-xs text-gray-700">Severity</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g., Severe" className="bg-gray-950 border-gray-800" {...field} />
+                              <Input placeholder="e.g., Severe" className="bg-white border-gray-300" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
-                    <Button type="button" variant="ghost" size="icon" onClick={() => removeAllergy(index)} className="hover:bg-red-500/20 hover:text-red-400 text-gray-500">
+                    <Button type="button" variant="ghost" size="icon" onClick={() => removeAllergy(index)} className="hover:bg-red-50 hover:text-red-600 text-gray-400">
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -344,7 +344,7 @@ export default function OnboardingForm() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="border-gray-800 bg-transparent hover:bg-gray-800 text-blue-400 border-dashed w-full py-6"
+                  className="border-gray-300 bg-white hover:bg-gray-50 text-blue-600 border-dashed w-full py-6"
                   onClick={() => appendAllergy({ substance: '', reaction: '', severity: '' })}
                 >
                   <Plus className="h-4 w-4 mr-2" /> Add Allergy
@@ -355,16 +355,16 @@ export default function OnboardingForm() {
             {/* STEP 4 */}
             <div className={step === 4 ? 'block animate-in fade-in slide-in-from-right-4 duration-300' : 'hidden'}>
               <div className="space-y-4">
-                <h3 className="text-lg font-medium text-gray-200">Primary Care Provider</h3>
+                <h3 className="text-lg font-medium text-gray-900">Primary Care Provider</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="primary_provider_name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Provider Name</FormLabel>
+                        <FormLabel className="text-gray-700">Provider Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Dr. Smith" className="bg-gray-900 border-gray-800" {...field} />
+                          <Input placeholder="Dr. Smith" className="bg-white border-gray-300" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -375,9 +375,9 @@ export default function OnboardingForm() {
                     name="primary_provider_phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
+                        <FormLabel className="text-gray-700">Phone Number</FormLabel>
                         <FormControl>
-                          <Input placeholder="(555) 123-4567" className="bg-gray-900 border-gray-800" {...field} />
+                          <Input placeholder="(555) 123-4567" className="bg-white border-gray-300" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -388,9 +388,9 @@ export default function OnboardingForm() {
                     name="primary_provider_email"
                     render={({ field }) => (
                       <FormItem className="md:col-span-2">
-                        <FormLabel>Email Address</FormLabel>
+                        <FormLabel className="text-gray-700">Email Address</FormLabel>
                         <FormControl>
-                          <Input placeholder="dr.smith@clinic.com" className="bg-gray-900 border-gray-800" {...field} />
+                          <Input placeholder="dr.smith@clinic.com" className="bg-white border-gray-300" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -398,16 +398,16 @@ export default function OnboardingForm() {
                   />
                 </div>
 
-                <h3 className="text-lg font-medium text-gray-200 mt-6 pt-6 border-t border-gray-800">Emergency Contact</h3>
+                <h3 className="text-lg font-medium text-gray-900 mt-6 pt-6 border-t border-gray-200">Emergency Contact</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="emergency_contact_name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Contact Name</FormLabel>
+                        <FormLabel className="text-gray-700">Contact Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Jane Doe" className="bg-gray-900 border-gray-800" {...field} />
+                          <Input placeholder="Jane Doe" className="bg-white border-gray-300" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -418,9 +418,9 @@ export default function OnboardingForm() {
                     name="emergency_contact_phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
+                        <FormLabel className="text-gray-700">Phone Number</FormLabel>
                         <FormControl>
-                          <Input placeholder="(555) 987-6543" className="bg-gray-900 border-gray-800" {...field} />
+                          <Input placeholder="(555) 987-6543" className="bg-white border-gray-300" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -438,10 +438,10 @@ export default function OnboardingForm() {
                   name="consent_basis"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Consent Basis *</FormLabel>
+                      <FormLabel className="text-gray-700">Consent Basis *</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="bg-gray-900 border-gray-800">
+                          <SelectTrigger className="bg-white border-gray-300">
                             <SelectValue placeholder="Select consent basis" />
                           </SelectTrigger>
                         </FormControl>
@@ -463,11 +463,11 @@ export default function OnboardingForm() {
                   name="baseline_notes"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Baseline Notes</FormLabel>
+                      <FormLabel className="text-gray-700">Baseline Notes</FormLabel>
                       <FormControl>
                         <Textarea 
                           placeholder="Any general notes about the recipient's baseline health, mobility, or communication preferences..." 
-                          className="min-h-32 bg-gray-900 border-gray-800 resize-none"
+                          className="min-h-32 bg-white border-gray-300 resize-none"
                           {...field} 
                         />
                       </FormControl>
@@ -477,7 +477,7 @@ export default function OnboardingForm() {
                 />
 
                 {error && (
-                  <div className="p-3 bg-red-900/30 border border-red-500/50 text-red-200 rounded-md text-sm">
+                  <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-md text-sm">
                     {error}
                   </div>
                 )}
@@ -486,19 +486,19 @@ export default function OnboardingForm() {
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="flex justify-between border-t border-gray-800 pt-6">
+      <CardFooter className="flex justify-between border-t border-gray-100 pt-6">
         <Button
           variant="outline"
-          className="border-gray-700 bg-transparent hover:bg-gray-800"
+          className="border-gray-300 bg-white hover:bg-gray-50 text-gray-700"
           onClick={prevStep}
           disabled={step === 1 || isSubmitting}
         >
           Previous
         </Button>
         {step < 5 ? (
-          <Button onClick={nextStep} className="bg-blue-600 hover:bg-blue-500 text-white">Next</Button>
+          <Button onClick={nextStep} className="bg-blue-600 hover:bg-blue-700 text-white border-0">Next</Button>
         ) : (
-          <Button onClick={form.handleSubmit(onSubmit)} disabled={isSubmitting} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white border-0 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+          <Button onClick={form.handleSubmit(onSubmit)} disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-700 text-white border-0 shadow-sm">
             {isSubmitting ? 'Saving...' : 'Complete Profile'}
           </Button>
         )}
