@@ -1,0 +1,4 @@
+Id,BIRTHDATE,DEATHDATE,SSN,PREFIX,FIRST,LAST,GENDER,RACE,ETHNICITY,MARITAL,ADDRESS,CITY,STATE,ZIP
+p1-margaret-okafor,1949-09-14,,999-00-0001,Ms.,Margaret,Okafor,F,black,nonhispanic,W,42 Birchwood Ave,Springfield,MA,01103
+p2-robert-chen,1957-04-22,,999-00-0002,Mr.,Robert,Chen,M,asian,nonhispanic,M,18 Harbor View Dr,Boston,MA,02108
+p3-maria-santos,1971-11-08,,999-00-0003,Ms.,Maria,Santos,F,white,hispanic,S,301 Maple St Apt 7,Cambridge,MA,02139

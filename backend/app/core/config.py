@@ -63,6 +63,9 @@ class Settings(BaseSettings):
     google_oauth_client_secret: str | None = None
     google_oauth_redirect_uri: str = "http://localhost:8000/auth/google/callback"
 
+    # --- Anthropic (CC-047 model comparison) ---
+    anthropic_api_key: str | None = None
+
     # --- Observability ---
     langfuse_public_key: str | None = None
     langfuse_secret_key: str | None = None

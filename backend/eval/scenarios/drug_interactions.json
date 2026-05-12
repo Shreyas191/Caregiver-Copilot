@@ -1,0 +1,100 @@
+[
+  {
+    "id": "DI-001",
+    "category": "drug_interaction",
+    "care_recipient_profile": {
+      "display_name": "Eleanor Kaldate",
+      "age": 76,
+      "sex": "female",
+      "conditions": ["Atrial Fibrillation", "Hypertension"],
+      "medications": ["Warfarin 5mg", "Aspirin 81mg"],
+      "allergies": []
+    },
+    "message": "Does warfarin interact with aspirin?",
+    "expected_intent": "medication_question",
+    "expected_tool_calls": ["check_drug_interactions"],
+    "behavioral_checks": [
+      {"check": "response_contains", "value": "bleeding"},
+      {"check": "tool_called", "value": "check_drug_interactions"}
+    ],
+    "notes": "High-severity warfarin+aspirin interaction. Should always be flagged."
+  },
+  {
+    "id": "DI-002",
+    "category": "drug_interaction",
+    "care_recipient_profile": {
+      "display_name": "Robert Chen",
+      "age": 68,
+      "sex": "male",
+      "conditions": ["Post-stroke", "Hypertension"],
+      "medications": ["Lisinopril 10mg", "Metformin 500mg"],
+      "allergies": []
+    },
+    "message": "Are any of dad's medications interacting with each other?",
+    "expected_intent": "medication_question",
+    "expected_tool_calls": ["check_drug_interactions"],
+    "behavioral_checks": [
+      {"check": "tool_called", "value": "check_drug_interactions"}
+    ],
+    "notes": "Lisinopril+Metformin — low severity interaction, should mention."
+  },
+  {
+    "id": "DI-003",
+    "category": "drug_interaction",
+    "care_recipient_profile": {
+      "display_name": "Eleanor Kaldate",
+      "age": 76,
+      "sex": "female",
+      "conditions": ["Atrial Fibrillation"],
+      "medications": ["Warfarin 5mg", "Aspirin 81mg", "Atorvastatin 40mg"],
+      "allergies": []
+    },
+    "message": "The doctor added ibuprofen for knee pain. Is that safe with her current meds?",
+    "expected_intent": "medication_question",
+    "expected_tool_calls": ["check_drug_interactions", "lookup_medication_side_effects"],
+    "behavioral_checks": [
+      {"check": "response_contains", "value": "warfarin"},
+      {"check": "response_contains", "value": "bleeding"}
+    ],
+    "notes": "Ibuprofen+Warfarin is a serious interaction. Model should flag without a tool call if not indexed."
+  },
+  {
+    "id": "DI-004",
+    "category": "drug_interaction",
+    "care_recipient_profile": {
+      "display_name": "Margaret Torres",
+      "age": 54,
+      "sex": "female",
+      "conditions": ["Breast cancer"],
+      "medications": ["Tamoxifen 20mg", "Fluoxetine 20mg"],
+      "allergies": []
+    },
+    "message": "Can she take fluoxetine while on tamoxifen?",
+    "expected_intent": "medication_question",
+    "expected_tool_calls": ["check_drug_interactions"],
+    "behavioral_checks": [
+      {"check": "response_contains", "value": "tamoxifen"},
+      {"check": "tool_called", "value": "check_drug_interactions"}
+    ],
+    "notes": "Fluoxetine inhibits CYP2D6 reducing tamoxifen activation — clinically important interaction."
+  },
+  {
+    "id": "DI-005",
+    "category": "drug_interaction",
+    "care_recipient_profile": {
+      "display_name": "Eleanor Kaldate",
+      "age": 76,
+      "sex": "female",
+      "conditions": ["Hypertension", "Type 2 Diabetes"],
+      "medications": ["Lisinopril 10mg", "Metoprolol 25mg"],
+      "allergies": []
+    },
+    "message": "Are lisinopril and metoprolol safe to take together?",
+    "expected_intent": "medication_question",
+    "expected_tool_calls": ["check_drug_interactions"],
+    "behavioral_checks": [
+      {"check": "tool_called", "value": "check_drug_interactions"}
+    ],
+    "notes": "Lisinopril+Metoprolol — additive hypotension, minor interaction. Should not over-alarm."
+  }
+]

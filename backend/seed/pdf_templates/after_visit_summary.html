@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: Arial, sans-serif; font-size: 10.5pt; margin: 40px; color: #1a1a1a; }
+  .header { border-bottom: 3px solid #5b2d8e; padding-bottom: 10px; margin-bottom: 16px; }
+  .header h1 { color: #5b2d8e; font-size: 15pt; margin: 0; }
+  .header .subtitle { color: #555; font-size: 9pt; }
+  .doc-title { font-size: 13pt; font-weight: bold; margin-top: 6px; color: #333; }
+  .patient-box { background: #f8f0ff; border: 1px solid #c0a0e0; padding: 10px; margin-bottom: 16px; }
+  .patient-box table { width: 100%; border-collapse: collapse; }
+  .patient-box td { padding: 3px 8px; font-size: 10pt; }
+  .patient-box td:first-child { font-weight: bold; width: 150px; color: #5b2d8e; }
+  h2 { color: #5b2d8e; font-size: 11pt; border-bottom: 1px solid #ccc; padding-bottom: 3px; margin-top: 18px; }
+  .section p { margin: 6px 0; line-height: 1.5; }
+  ul { margin: 6px 0; padding-left: 20px; }
+  li { margin: 4px 0; line-height: 1.4; }
+  .vitals-table { width: 100%; border-collapse: collapse; font-size: 10pt; }
+  .vitals-table th { background: #5b2d8e; color: white; padding: 5px 10px; }
+  .vitals-table td { padding: 5px 10px; border-bottom: 1px solid #e0e0e0; text-align: center; }
+  .med-table { width: 100%; border-collapse: collapse; font-size: 10pt; }
+  .med-table th { background: #5b2d8e; color: white; padding: 5px 10px; text-align: left; }
+  .med-table td { padding: 5px 10px; border-bottom: 1px solid #e0e0e0; }
+  .highlight-box { background: #e8f5e9; border: 1px solid #81c784; padding: 10px; border-radius: 4px; margin: 10px 0; }
+  .caregiver-note { background: #fff8e1; border: 1px solid #ffd54f; padding: 10px; border-radius: 4px; margin: 10px 0; }
+  .footer { font-size: 8pt; color: #888; text-align: center; margin-top: 30px; border-top: 1px solid #ccc; padding-top: 8px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>{{ practice_name }}</h1>
+  <div class="subtitle">{{ practice_address }} &nbsp;|&nbsp; {{ practice_phone }}</div>
+  <div class="doc-title">AFTER-VISIT SUMMARY</div>
+</div>
+
+<div class="patient-box">
+  <table>
+    <tr><td>Patient:</td><td>{{ patient_name }}</td><td>MRN:</td><td>{{ mrn }}</td></tr>
+    <tr><td>DOB:</td><td>{{ dob }}</td><td>Age/Sex:</td><td>{{ age_sex }}</td></tr>
+    <tr><td>Visit Date:</td><td>{{ visit_date }}</td><td>Provider:</td><td>{{ provider }}</td></tr>
+    <tr><td>Visit Type:</td><td colspan="3">{{ visit_type }}</td></tr>
+  </table>
+</div>
+
+<h2>Reason for Visit</h2>
+<div class="section"><p>{{ reason_for_visit }}</p></div>
+
+<h2>Vitals Today</h2>
+<table class="vitals-table">
+  <thead><tr>
+    {% for col in vitals_cols %}<th>{{ col }}</th>{% endfor %}
+  </tr></thead>
+  <tbody><tr>
+    {% for val in vitals_vals %}<td>{{ val }}</td>{% endfor %}
+  </tr></tbody>
+</table>
+
+<h2>Assessment &amp; Diagnoses</h2>
+<div class="section">
+  <ul>{% for dx in assessment %}<li>{{ dx }}</li>{% endfor %}</ul>
+</div>
+
+<h2>Plan &amp; Next Steps</h2>
+<div class="section">
+  <ul>{% for step in plan %}<li>{{ step }}</li>{% endfor %}</ul>
+</div>
+
+<h2>Current Medications</h2>
+<table class="med-table">
+  <thead><tr><th>Medication</th><th>Dose &amp; Frequency</th><th>Notes</th></tr></thead>
+  <tbody>
+    {% for med in medications %}
+    <tr><td>{{ med.name }}</td><td>{{ med.dose_freq }}</td><td>{{ med.notes }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if med_changes %}
+<div class="highlight-box">
+  <strong>Medication Changes at This Visit:</strong>
+  <ul>{% for chg in med_changes %}<li>{{ chg }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+<h2>Follow-up</h2>
+<div class="section">
+  <ul>{% for fu in followup %}<li>{{ fu }}</li>{% endfor %}</ul>
+</div>
+
+<div class="caregiver-note">
+  <strong>Note for Caregiver:</strong>
+  <p>{{ caregiver_note }}</p>
+</div>
+
+<p style="font-size:9pt; margin-top:16px;">
+  Questions? Call {{ practice_phone }} or send a message through the patient portal.
+</p>
+
+<div class="footer">
+  {{ practice_name }} | After-Visit Summary | {{ visit_date }}<br>
+  All data is entirely synthetic and does not represent real patient information.
+</div>
+</body>
+</html>

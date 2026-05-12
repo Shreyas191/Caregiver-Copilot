@@ -1,0 +1,186 @@
+[
+  {
+    "id": "urg-001",
+    "description": "Chest pain radiating to left arm in 68yo male",
+    "symptoms": ["chest pain", "left arm pain", "shortness of breath"],
+    "vitals": [{"type": "blood_pressure", "systolic": 155, "diastolic": 95}],
+    "medications": ["aspirin", "metoprolol"],
+    "context": "Started 20 minutes ago, patient is sweating",
+    "expected_level": "emergency"
+  },
+  {
+    "id": "urg-002",
+    "description": "Sudden facial drooping and slurred speech",
+    "symptoms": ["facial drooping", "slurred speech", "arm weakness"],
+    "vitals": [],
+    "medications": ["warfarin"],
+    "context": "Onset 30 minutes ago, came on suddenly",
+    "expected_level": "emergency"
+  },
+  {
+    "id": "urg-003",
+    "description": "Severe allergic reaction after bee sting",
+    "symptoms": ["hives", "throat swelling", "difficulty breathing"],
+    "vitals": [],
+    "medications": ["lisinopril"],
+    "context": "Just got stung by a bee 5 minutes ago",
+    "expected_level": "emergency"
+  },
+  {
+    "id": "urg-004",
+    "description": "BP 185/115 with severe headache and vision changes",
+    "symptoms": ["severe headache", "blurry vision"],
+    "vitals": [{"type": "blood_pressure", "systolic": 185, "diastolic": 115}],
+    "medications": ["hydrochlorothiazide", "lisinopril"],
+    "context": "Has history of hypertension, headache started this morning",
+    "expected_level": "emergency"
+  },
+  {
+    "id": "urg-005",
+    "description": "Unresponsive after fall",
+    "symptoms": ["unresponsive", "head injury"],
+    "vitals": [],
+    "medications": ["aspirin", "clopidogrel"],
+    "context": "Found on the floor, does not respond to voice",
+    "expected_level": "emergency"
+  },
+  {
+    "id": "urg-006",
+    "description": "BP 185/118 with no symptoms in hypertensive patient",
+    "symptoms": [],
+    "vitals": [{"type": "blood_pressure", "systolic": 185, "diastolic": 118}],
+    "medications": ["amlodipine", "lisinopril"],
+    "context": "Took BP at home, feels fine otherwise",
+    "expected_level": "urgent"
+  },
+  {
+    "id": "urg-007",
+    "description": "High fever with confusion in 79yo",
+    "symptoms": ["fever", "confusion", "decreased urine output"],
+    "vitals": [{"type": "temperature", "value": 103.2, "unit": "F"}],
+    "medications": ["metformin", "atorvastatin"],
+    "context": "Has been confused since this morning, nursing home resident",
+    "expected_level": "urgent"
+  },
+  {
+    "id": "urg-008",
+    "description": "Severe abdominal pain 8/10",
+    "symptoms": ["severe abdominal pain"],
+    "vitals": [{"type": "heart_rate", "value": 102, "unit": "bpm"}],
+    "medications": ["omeprazole"],
+    "context": "Pain started 2 hours ago, cannot get comfortable",
+    "expected_level": "urgent"
+  },
+  {
+    "id": "urg-009",
+    "description": "Suspected UTI with confusion in elderly woman",
+    "symptoms": ["confusion", "burning urination", "low-grade fever"],
+    "vitals": [{"type": "temperature", "value": 99.8, "unit": "F"}],
+    "medications": ["donepezil", "lisinopril"],
+    "context": "76yo woman with mild dementia, much more confused than usual today",
+    "expected_level": "urgent"
+  },
+  {
+    "id": "urg-010",
+    "description": "New fall with possible hip injury",
+    "symptoms": ["hip pain", "cannot bear weight"],
+    "vitals": [],
+    "medications": ["warfarin", "calcium"],
+    "context": "Fell in bathroom, left hip is painful and she cannot stand",
+    "expected_level": "urgent"
+  },
+  {
+    "id": "urg-011",
+    "description": "Cough and low-grade fever for 4 days",
+    "symptoms": ["cough", "low-grade fever", "fatigue"],
+    "vitals": [{"type": "temperature", "value": 100.4, "unit": "F"}],
+    "medications": ["metformin", "lisinopril"],
+    "context": "Started with a cold, not getting better after 4 days",
+    "expected_level": "same_day"
+  },
+  {
+    "id": "urg-012",
+    "description": "New dizziness possibly from new medication",
+    "symptoms": ["dizziness", "lightheadedness on standing"],
+    "vitals": [{"type": "blood_pressure", "systolic": 105, "diastolic": 68}],
+    "medications": ["lisinopril", "hydrochlorothiazide", "tamsulosin"],
+    "context": "Started tamsulosin 3 days ago, new dizziness since then",
+    "expected_level": "same_day"
+  },
+  {
+    "id": "urg-013",
+    "description": "Mild rash after starting new antibiotic",
+    "symptoms": ["mild rash on arms", "mild itching"],
+    "vitals": [],
+    "medications": ["amoxicillin", "metformin"],
+    "context": "Started amoxicillin 2 days ago for dental procedure, now has a rash",
+    "expected_level": "same_day"
+  },
+  {
+    "id": "urg-014",
+    "description": "Wound not healing after 2 weeks",
+    "symptoms": ["wound not healing", "mild redness around wound"],
+    "vitals": [],
+    "medications": ["insulin", "metformin"],
+    "context": "Diabetic patient, foot wound from 2 weeks ago, not healing, slight redness",
+    "expected_level": "same_day"
+  },
+  {
+    "id": "urg-015",
+    "description": "GI upset for 2 days, mild nausea",
+    "symptoms": ["nausea", "decreased appetite", "loose stools"],
+    "vitals": [],
+    "medications": ["metformin", "atorvastatin"],
+    "context": "Not vomiting, drinking fluids, no blood in stool",
+    "expected_level": "same_day"
+  },
+  {
+    "id": "urg-016",
+    "description": "Medication question about timing",
+    "symptoms": [],
+    "vitals": [],
+    "medications": ["metformin", "levothyroxine"],
+    "context": "Caregiver asking if it matters what time of day to give levothyroxine",
+    "expected_level": "routine"
+  },
+  {
+    "id": "urg-017",
+    "description": "Stable mild knee pain",
+    "symptoms": ["mild knee pain", "stiffness in the morning"],
+    "vitals": [],
+    "medications": ["ibuprofen", "calcium"],
+    "context": "Known osteoarthritis, pain is typical for her, ibuprofen helps",
+    "expected_level": "routine"
+  },
+  {
+    "id": "urg-018",
+    "description": "Routine vital check, all normal",
+    "symptoms": [],
+    "vitals": [
+      {"type": "blood_pressure", "systolic": 128, "diastolic": 78},
+      {"type": "heart_rate", "value": 72, "unit": "bpm"},
+      {"type": "glucose", "value": 118, "unit": "mg/dL"}
+    ],
+    "medications": ["metformin", "lisinopril"],
+    "context": "Regular morning check, patient feels well",
+    "expected_level": "routine"
+  },
+  {
+    "id": "urg-019",
+    "description": "Follow-up question after recent doctor visit",
+    "symptoms": ["mild fatigue"],
+    "vitals": [],
+    "medications": ["lisinopril", "metformin", "atorvastatin"],
+    "context": "Just saw PCP yesterday, new statin started, wondering about muscle soreness to watch for",
+    "expected_level": "routine"
+  },
+  {
+    "id": "urg-020",
+    "description": "Borderline case: confusion with low-grade fever in elderly",
+    "symptoms": ["mild confusion", "low-grade fever"],
+    "vitals": [{"type": "temperature", "value": 99.2, "unit": "F"}],
+    "medications": ["donepezil", "memantine"],
+    "context": "80yo with Alzheimer's, slightly more confused than normal, no other symptoms",
+    "expected_level": "same_day"
+  }
+]

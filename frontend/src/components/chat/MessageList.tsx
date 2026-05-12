@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import type { ChatMessage } from '@/hooks/useChatStream';
 
 type MessageListProps = {
@@ -36,9 +38,22 @@ export function MessageList({ messages }: MessageListProps) {
                 : 'bg-white border border-gray-200 text-gray-900 rounded-bl-sm shadow-sm'
             }`}
           >
-            {msg.content}
-            {msg.streaming && (
-              <span className="inline-block w-1.5 h-4 ml-0.5 bg-current animate-pulse align-middle" />
+            {msg.role === 'assistant' ? (
+              <div className="prose prose-sm max-w-none prose-headings:font-semibold prose-headings:text-gray-900 prose-p:my-1 prose-ul:my-1 prose-li:my-0.5 prose-strong:text-gray-900">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {msg.content}
+                </ReactMarkdown>
+                {msg.streaming && (
+                  <span className="inline-block w-1.5 h-4 ml-0.5 bg-gray-600 animate-pulse align-middle" />
+                )}
+              </div>
+            ) : (
+              <>
+                {msg.content}
+                {msg.streaming && (
+                  <span className="inline-block w-1.5 h-4 ml-0.5 bg-current animate-pulse align-middle" />
+                )}
+              </>
             )}
           </div>
         </div>

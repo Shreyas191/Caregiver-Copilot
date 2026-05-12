@@ -36,6 +36,26 @@ export function useChatStream(careRecipientId: string) {
     [getToken],
   );
 
+  // Load an existing thread: sets both threadId and messages so follow-up messages
+  // are sent with the correct thread_id instead of creating a new orphan thread.
+  const loadThread = useCallback(
+    async (tid: string) => {
+      setThreadId(tid);
+      setMessages([]);
+      const token = await getToken();
+      if (!token) return;
+      const res = await fetch(`${API_BASE}/chat/threads/${tid}/messages`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return;
+      const data: Array<{ id: string; role: string; content: string }> = await res.json();
+      setMessages(
+        data.map((m) => ({ id: m.id, role: m.role as 'user' | 'assistant', content: m.content })),
+      );
+    },
+    [getToken],
+  );
+
   const send = useCallback(
     async (content: string) => {
       const token = await getToken();
@@ -107,5 +127,5 @@ export function useChatStream(careRecipientId: string) {
     setMessages([]);
   }, []);
 
-  return { messages, threadId, streaming, send, loadHistory, startNewThread };
+  return { messages, threadId, streaming, send, loadHistory, loadThread, startNewThread };
 }

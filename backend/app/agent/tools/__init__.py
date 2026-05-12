@@ -12,6 +12,9 @@ from app.agent.tools.write_tools import (
     log_episode,
     log_vital,
 )
+from app.agent.tools.clinical_tools import get_clinical_tools
+from app.agent.tools.urgency import get_urgency_tools
+from app.agent.tools.comms_tools import get_comms_tools
 
 __all__ = [
     "Tool",
@@ -24,4 +27,7 @@ __all__ = [
     "get_write_tools",
     "log_vital",
     "log_episode",
+    "get_clinical_tools",
+    "get_urgency_tools",
+    "get_comms_tools",
 ]

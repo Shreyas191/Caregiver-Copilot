@@ -1,0 +1,22 @@
+[
+  { "id": "rt-001", "message": "Good morning!", "expected_intent": "casual_chat" },
+  { "id": "rt-002", "message": "Thanks for your help yesterday", "expected_intent": "casual_chat" },
+  { "id": "rt-003", "message": "What can you help me with?", "expected_intent": "casual_chat" },
+  { "id": "rt-004", "message": "How does the timeline view work?", "expected_intent": "casual_chat" },
+  { "id": "rt-005", "message": "Mom's BP was 140/88 this morning", "expected_intent": "vital_logging" },
+  { "id": "rt-006", "message": "Glucose reading: 182 mg/dL", "expected_intent": "vital_logging" },
+  { "id": "rt-007", "message": "Weight: 163 lbs today", "expected_intent": "vital_logging" },
+  { "id": "rt-008", "message": "Temperature 99.2 this morning, logged it", "expected_intent": "vital_logging" },
+  { "id": "rt-009", "message": "Mom seemed confused this morning, BP 165/95, more tired lately", "expected_intent": "symptom_report" },
+  { "id": "rt-010", "message": "Dad fell getting up from the chair this afternoon", "expected_intent": "symptom_report" },
+  { "id": "rt-011", "message": "She has had a fever for 2 days now and won't eat", "expected_intent": "symptom_report" },
+  { "id": "rt-012", "message": "He complained of chest tightness after walking", "expected_intent": "symptom_report" },
+  { "id": "rt-013", "message": "Can she take lisinopril with metformin?", "expected_intent": "medication_question" },
+  { "id": "rt-014", "message": "What are the side effects of furosemide?", "expected_intent": "medication_question" },
+  { "id": "rt-015", "message": "Should she take the new blood pressure pill with or without food?", "expected_intent": "medication_question" },
+  { "id": "rt-016", "message": "What did the lab results say last week?", "expected_intent": "document_question" },
+  { "id": "rt-017", "message": "Can you summarize the discharge summary from the hospital?", "expected_intent": "document_question" },
+  { "id": "rt-018", "message": "He's not breathing and I can't wake him up", "expected_intent": "escalation" },
+  { "id": "rt-019", "message": "She's having a seizure right now", "expected_intent": "escalation" },
+  { "id": "rt-020", "message": "BP 145/88, glucose 140, took all her meds this morning", "expected_intent": "vital_logging" }
+]

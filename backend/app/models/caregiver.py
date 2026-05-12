@@ -11,3 +11,4 @@ class Caregiver(Base, IDMixin, TimestampMixin):
     display_name: Mapped[str] = mapped_column(String, nullable=False)
     email: Mapped[str] = mapped_column(String, nullable=False)
     timezone: Mapped[str] = mapped_column(String, nullable=False, default="America/New_York")
+    google_oauth_token: Mapped[str | None] = mapped_column(String, nullable=True)

@@ -18,7 +18,7 @@ export default function ChatPage() {
   const { getToken } = useAuth();
   const [recipientName, setRecipientName] = useState<string>('');
 
-  const { messages, threadId, streaming, send, loadHistory, startNewThread } =
+  const { messages, threadId, streaming, send, loadThread, startNewThread } =
     useChatStream(careRecipientId);
 
   // Load care recipient name for the header
@@ -38,10 +38,9 @@ export default function ChatPage() {
 
   const handleSelectThread = useCallback(
     async (tid: string) => {
-      startNewThread();
-      await loadHistory(tid);
+      await loadThread(tid);
     },
-    [startNewThread, loadHistory],
+    [loadThread],
   );
 
   return (

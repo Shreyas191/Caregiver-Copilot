@@ -54,20 +54,33 @@ class OpenAICompatibleProvider(ModelProvider):
     # Retry helper
     # ------------------------------------------------------------------
 
+    @staticmethod
+    def _retry_after(e: openai.APIStatusError) -> float:
+        """Extract Retry-After seconds from the response headers, fallback to default."""
+        try:
+            header = e.response.headers.get("retry-after") or e.response.headers.get("Retry-After")
+            if header:
+                return float(header)
+        except Exception:
+            pass
+        return _RETRY_DELAY
+
     async def _retry_once(self, coro_fn, delay: float = _RETRY_DELAY):
-        """Run coro_fn(); on 429 / 5xx retry once after `delay` seconds."""
+        """Run coro_fn(); on 429 / 5xx retry once, honouring Retry-After if present."""
         try:
             return await coro_fn()
         except openai.RateLimitError as e:
-            logger.warning("Rate-limited by provider (429); retrying in %.1fs — %s", delay, e)
-            await asyncio.sleep(delay)
+            wait = self._retry_after(e)
+            logger.warning("Rate-limited by provider (429); retrying in %.1fs — %s", wait, e)
+            await asyncio.sleep(wait)
             return await coro_fn()
         except openai.APIStatusError as e:
             if e.status_code in _RETRY_STATUSES:
+                wait = self._retry_after(e)
                 logger.warning(
-                    "Provider returned %d; retrying in %.1fs — %s", e.status_code, delay, e
+                    "Provider returned %d; retrying in %.1fs — %s", e.status_code, wait, e
                 )
-                await asyncio.sleep(delay)
+                await asyncio.sleep(wait)
                 return await coro_fn()
             raise
 

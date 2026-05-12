@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: Arial, sans-serif; font-size: 11pt; margin: 40px; color: #1a1a1a; }
+  .header { border-bottom: 3px solid #1a3a6b; padding-bottom: 10px; margin-bottom: 20px; }
+  .header h1 { color: #1a3a6b; font-size: 16pt; margin: 0; }
+  .header .subtitle { color: #555; font-size: 9pt; }
+  .patient-box { background: #f0f4ff; border: 1px solid #b0c0e0; padding: 12px; margin-bottom: 20px; }
+  .patient-box table { width: 100%; border-collapse: collapse; }
+  .patient-box td { padding: 3px 8px; font-size: 10pt; }
+  .patient-box td:first-child { font-weight: bold; width: 160px; color: #1a3a6b; }
+  h2 { color: #1a3a6b; font-size: 12pt; border-bottom: 1px solid #ccc; padding-bottom: 4px; margin-top: 20px; }
+  .section { margin-bottom: 16px; }
+  .section p { margin: 6px 0; line-height: 1.5; }
+  ul { margin: 6px 0; padding-left: 20px; }
+  li { margin: 4px 0; line-height: 1.4; }
+  .med-table { width: 100%; border-collapse: collapse; font-size: 10pt; }
+  .med-table th { background: #1a3a6b; color: white; padding: 6px 10px; text-align: left; }
+  .med-table td { padding: 5px 10px; border-bottom: 1px solid #e0e0e0; }
+  .med-table tr:nth-child(even) td { background: #f8f8f8; }
+  .signature { margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; }
+  .footer { position: fixed; bottom: 20px; font-size: 8pt; color: #888; text-align: center; width: 100%; }
+  .alert { background: #fff3cd; border: 1px solid #ffc107; padding: 10px; border-radius: 4px; margin: 10px 0; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>{{ hospital_name }}</h1>
+  <div class="subtitle">{{ hospital_address }} &nbsp;|&nbsp; Phone: {{ hospital_phone }}</div>
+  <div style="font-size:13pt; font-weight:bold; margin-top:8px; color:#333;">DISCHARGE SUMMARY</div>
+</div>
+
+<div class="patient-box">
+  <table>
+    <tr><td>Patient Name:</td><td>{{ patient_name }}</td><td>MRN:</td><td>{{ mrn }}</td></tr>
+    <tr><td>Date of Birth:</td><td>{{ dob }}</td><td>Age/Sex:</td><td>{{ age_sex }}</td></tr>
+    <tr><td>Admission Date:</td><td>{{ admission_date }}</td><td>Discharge Date:</td><td>{{ discharge_date }}</td></tr>
+    <tr><td>Attending Physician:</td><td>{{ physician }}</td><td>Service:</td><td>{{ service }}</td></tr>
+    <tr><td>Primary Diagnosis:</td><td colspan="3"><strong>{{ primary_dx }}</strong></td></tr>
+  </table>
+</div>
+
+<h2>Reason for Admission</h2>
+<div class="section"><p>{{ reason_for_admission }}</p></div>
+
+<h2>Hospital Course</h2>
+<div class="section"><p>{{ hospital_course }}</p></div>
+
+<h2>Significant Findings</h2>
+<div class="section">
+  <p><strong>Vitals on Admission:</strong> {{ vitals_admission }}</p>
+  <p><strong>Vitals on Discharge:</strong> {{ vitals_discharge }}</p>
+  <p><strong>Key Lab Values:</strong></p>
+  <ul>{% for lab in key_labs %}<li>{{ lab }}</li>{% endfor %}</ul>
+</div>
+
+<h2>Procedures Performed</h2>
+<div class="section">
+  <ul>{% for proc in procedures %}<li>{{ proc }}</li>{% endfor %}</ul>
+</div>
+
+<h2>Discharge Medications</h2>
+<table class="med-table">
+  <thead><tr><th>Medication</th><th>Dose</th><th>Frequency</th><th>Route</th><th>Duration</th></tr></thead>
+  <tbody>
+    {% for med in discharge_meds %}
+    <tr><td>{{ med.name }}</td><td>{{ med.dose }}</td><td>{{ med.frequency }}</td><td>{{ med.route }}</td><td>{{ med.duration }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>Discharge Instructions</h2>
+<div class="section">
+  <ul>{% for instr in discharge_instructions %}<li>{{ instr }}</li>{% endfor %}</ul>
+</div>
+
+{% if alerts %}
+<div class="alert"><strong>⚠ Alert for Caregivers:</strong> {{ alerts }}</div>
+{% endif %}
+
+<h2>Follow-up Appointments</h2>
+<div class="section">
+  <ul>{% for appt in followup %}<li>{{ appt }}</li>{% endfor %}</ul>
+</div>
+
+<div class="signature">
+  <p><strong>Attending Physician:</strong> {{ physician }}</p>
+  <p><strong>Date/Time of Dictation:</strong> {{ dictation_datetime }}</p>
+  <p><em>This document was generated for the Caregiver Co-Pilot demonstration system.
+  All data is entirely synthetic and does not represent real patient information.</em></p>
+</div>
+
+<div class="footer">
+  {{ hospital_name }} | Confidential — For Care Coordination Purposes Only | Page 1 of 1
+</div>
+</body>
+</html>

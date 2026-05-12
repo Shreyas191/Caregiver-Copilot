@@ -3,7 +3,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes import chat, health, me, care_recipients, medications
+from app.routes import chat, health, me, care_recipients, medications, google_oauth, timeline, documents
 
 app = FastAPI(
     title="Caregiver Co-Pilot API",
@@ -26,3 +26,6 @@ app.include_router(me.router)
 app.include_router(care_recipients.router, prefix="/api/v1")
 app.include_router(medications.router, prefix="/api/v1")
 app.include_router(chat.router, prefix="/api/v1")
+app.include_router(google_oauth.router)
+app.include_router(timeline.router, prefix="/api/v1")
+app.include_router(documents.router, prefix="/api/v1")
