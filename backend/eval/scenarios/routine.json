@@ -1,0 +1,114 @@
+[
+  {
+    "id": "ROU-001",
+    "category": "routine",
+    "care_recipient_profile": {
+      "display_name": "Eleanor Kaldate",
+      "age": 76,
+      "sex": "female",
+      "conditions": ["Hypertension"],
+      "medications": ["Lisinopril 10mg"]
+    },
+    "message": "Hi, how are you?",
+    "expected_intent": "casual_chat",
+    "expected_tool_calls": [],
+    "behavioral_checks": [
+      {"check": "intent_is", "value": "casual_chat"},
+      {"check": "no_tool_calls", "value": true}
+    ],
+    "notes": "Casual greeting — no tools, fast casual_handler path."
+  },
+  {
+    "id": "ROU-002",
+    "category": "routine",
+    "care_recipient_profile": {
+      "display_name": "Eleanor Kaldate",
+      "age": 76,
+      "sex": "female",
+      "conditions": ["Hypertension"],
+      "medications": ["Lisinopril 10mg"]
+    },
+    "message": "Mom's blood pressure was 142/88 this morning",
+    "expected_intent": "vital_logging",
+    "expected_tool_calls": ["log_vital"],
+    "behavioral_checks": [
+      {"check": "tool_called", "value": "log_vital"},
+      {"check": "intent_is", "value": "vital_logging"}
+    ],
+    "notes": "Vital logging — should call log_vital with blood_pressure."
+  },
+  {
+    "id": "ROU-003",
+    "category": "routine",
+    "care_recipient_profile": {
+      "display_name": "Eleanor Kaldate",
+      "age": 76,
+      "sex": "female",
+      "conditions": ["Type 2 Diabetes"],
+      "medications": ["Metformin 500mg"]
+    },
+    "message": "Her fasting glucose today was 132 mg/dL",
+    "expected_intent": "vital_logging",
+    "expected_tool_calls": ["log_vital"],
+    "behavioral_checks": [
+      {"check": "tool_called", "value": "log_vital"}
+    ],
+    "notes": "Glucose vital logging."
+  },
+  {
+    "id": "ROU-004",
+    "category": "routine",
+    "care_recipient_profile": {
+      "display_name": "Eleanor Kaldate",
+      "age": 76,
+      "sex": "female",
+      "conditions": [],
+      "medications": []
+    },
+    "message": "What's the weather like today?",
+    "expected_intent": "casual_chat",
+    "expected_tool_calls": [],
+    "behavioral_checks": [
+      {"check": "intent_is", "value": "casual_chat"},
+      {"check": "no_tool_calls", "value": true}
+    ],
+    "notes": "Off-topic casual question. Casual handler should respond politely."
+  },
+  {
+    "id": "ROU-005",
+    "category": "routine",
+    "care_recipient_profile": {
+      "display_name": "Robert Chen",
+      "age": 68,
+      "sex": "male",
+      "conditions": ["Post-stroke"],
+      "medications": ["Aspirin 81mg"]
+    },
+    "message": "Dad weighs 78kg as of this morning",
+    "expected_intent": "vital_logging",
+    "expected_tool_calls": ["log_vital"],
+    "behavioral_checks": [
+      {"check": "tool_called", "value": "log_vital"}
+    ],
+    "notes": "Weight vital logging."
+  },
+  {
+    "id": "ROU-006",
+    "category": "routine",
+    "care_recipient_profile": {
+      "display_name": "Eleanor Kaldate",
+      "age": 76,
+      "sex": "female",
+      "conditions": [],
+      "medications": ["Lisinopril 10mg"]
+    },
+    "message": "Thanks for your help earlier!",
+    "expected_intent": "casual_chat",
+    "expected_tool_calls": [],
+    "behavioral_checks": [
+      {"check": "intent_is", "value": "casual_chat"},
+      {"check": "no_tool_calls", "value": true}
+    ],
+    "notes": "Acknowledgment — casual_chat, no tools."
+  }
+]

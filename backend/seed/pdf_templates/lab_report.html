@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: Arial, sans-serif; font-size: 10.5pt; margin: 40px; color: #1a1a1a; }
+  .header { border-bottom: 3px solid #006633; padding-bottom: 10px; margin-bottom: 16px; }
+  .header h1 { color: #006633; font-size: 15pt; margin: 0; }
+  .header .subtitle { color: #555; font-size: 9pt; }
+  .doc-title { font-size: 13pt; font-weight: bold; margin-top: 6px; color: #333; }
+  .patient-box { background: #f0fff4; border: 1px solid #90c0a0; padding: 10px; margin-bottom: 16px; }
+  .patient-box table { width: 100%; border-collapse: collapse; }
+  .patient-box td { padding: 3px 8px; font-size: 10pt; }
+  .patient-box td:first-child { font-weight: bold; width: 150px; color: #006633; }
+  h2 { color: #006633; font-size: 11pt; border-bottom: 1px solid #ccc; padding-bottom: 3px; margin-top: 18px; }
+  .lab-table { width: 100%; border-collapse: collapse; font-size: 10pt; margin-top: 8px; }
+  .lab-table th { background: #006633; color: white; padding: 6px 10px; text-align: left; }
+  .lab-table td { padding: 5px 10px; border-bottom: 1px solid #e0e0e0; }
+  .lab-table tr:nth-child(even) td { background: #f8f8f8; }
+  .flag-H { color: #cc0000; font-weight: bold; }
+  .flag-L { color: #0000cc; font-weight: bold; }
+  .flag-CR { color: #cc0000; font-weight: bold; background: #ffe0e0; padding: 1px 4px; }
+  .interpretation { background: #f9f9f9; border-left: 4px solid #006633; padding: 10px; margin-top: 16px; }
+  .footer { font-size: 8pt; color: #888; text-align: center; margin-top: 40px; border-top: 1px solid #ccc; padding-top: 8px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>{{ lab_name }}</h1>
+  <div class="subtitle">{{ lab_address }} &nbsp;|&nbsp; CLIA: {{ clia_number }}</div>
+  <div class="doc-title">LABORATORY REPORT</div>
+</div>
+
+<div class="patient-box">
+  <table>
+    <tr><td>Patient:</td><td>{{ patient_name }}</td><td>MRN:</td><td>{{ mrn }}</td></tr>
+    <tr><td>DOB:</td><td>{{ dob }}</td><td>Age/Sex:</td><td>{{ age_sex }}</td></tr>
+    <tr><td>Ordering Provider:</td><td>{{ ordering_provider }}</td><td>Specimen Date:</td><td>{{ specimen_date }}</td></tr>
+    <tr><td>Collection Time:</td><td>{{ collection_time }}</td><td>Report Date:</td><td>{{ report_date }}</td></tr>
+  </table>
+</div>
+
+{% for panel in panels %}
+<h2>{{ panel.name }}</h2>
+<table class="lab-table">
+  <thead>
+    <tr>
+      <th style="width:40%">Test</th>
+      <th style="width:15%">Result</th>
+      <th style="width:10%">Flag</th>
+      <th style="width:25%">Reference Range</th>
+      <th style="width:10%">Units</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in panel.rows %}
+    <tr>
+      <td>{{ row.test }}</td>
+      <td>{{ row.result }}</td>
+      <td class="flag-{{ row.flag }}">{{ row.flag }}</td>
+      <td>{{ row.reference }}</td>
+      <td>{{ row.units }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endfor %}
+
+<div class="interpretation">
+  <strong>Interpretation / Comments:</strong>
+  <p>{{ interpretation }}</p>
+</div>
+
+<p style="font-size:9pt; margin-top:16px;">
+  <strong>Reported by:</strong> {{ pathologist }}, MD &nbsp;|&nbsp;
+  <strong>Verified:</strong> {{ verified_datetime }}
+</p>
+
+<div class="footer">
+  {{ lab_name }} | CONFIDENTIAL — This report contains sensitive health information.<br>
+  All data is entirely synthetic and does not represent real patient information.
+</div>
+</body>
+</html>

@@ -1,0 +1,14 @@
+START,STOP,PATIENT,CODE,DESCRIPTION
+2010-03-01,,p1-margaret-okafor,I10,Hypertension
+2014-07-15,,p1-margaret-okafor,E11,Type 2 diabetes mellitus
+2021-02-10,,p1-margaret-okafor,G31.84,Mild cognitive impairment
+2018-11-05,,p1-margaret-okafor,E78.5,Hyperlipidemia
+2008-06-20,,p2-robert-chen,I10,Hypertension
+2023-08-14,,p2-robert-chen,I63.9,Cerebral infarction unspecified
+2016-04-03,,p2-robert-chen,E78.5,Hyperlipidemia
+2019-09-18,,p2-robert-chen,E11,Type 2 diabetes mellitus
+2022-03-28,,p2-robert-chen,Z87.39,Personal history of stroke
+2023-04-11,,p3-maria-santos,C50.911,Malignant neoplasm of unspecified site of right female breast - Stage 3B
+2023-05-01,,p3-maria-santos,T45.1X5A,Adverse effect of antineoplastic and immunosuppressive drugs
+2023-07-15,,p3-maria-santos,G62.9,Polyneuropathy unspecified - chemotherapy-induced
+2023-10-01,,p3-maria-santos,F41.1,Generalized anxiety disorder

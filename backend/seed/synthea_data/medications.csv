@@ -1,0 +1,17 @@
+START,STOP,PATIENT,CODE,DESCRIPTION,REASON_CODE,REASON_DESCRIPTION
+2010-03-15,,p1-margaret-okafor,29046,Lisinopril 10 MG Oral Tablet,I10,Hypertension
+2014-08-01,,p1-margaret-okafor,6809,Metformin 500 MG Oral Tablet,E11,Type 2 diabetes mellitus
+2021-02-20,,p1-margaret-okafor,135447,Donepezil 5 MG Oral Tablet,G31.84,Mild cognitive impairment
+2018-11-10,,p1-margaret-okafor,83367,Atorvastatin 20 MG Oral Tablet,E78.5,Hyperlipidemia
+2019-01-05,,p1-margaret-okafor,1191,Aspirin 81 MG Oral Tablet,I10,Cardiovascular prevention
+2008-07-01,,p2-robert-chen,17767,Amlodipine 5 MG Oral Tablet,I10,Hypertension
+2023-08-20,,p2-robert-chen,32968,Clopidogrel 75 MG Oral Tablet,I63.9,Post-stroke antiplatelet therapy
+2023-08-20,,p2-robert-chen,1191,Aspirin 81 MG Oral Tablet,I63.9,Post-stroke antiplatelet therapy
+2016-04-10,,p2-robert-chen,83367,Atorvastatin 40 MG Oral Tablet,E78.5,Hyperlipidemia
+2019-10-01,,p2-robert-chen,6809,Metformin 500 MG Oral Tablet,E11,Type 2 diabetes mellitus
+2023-08-20,,p2-robert-chen,29046,Lisinopril 5 MG Oral Tablet,I10,Hypertension post-stroke
+2023-04-15,,p3-maria-santos,56946,Paclitaxel 30 MG/ML Injectable Solution,C50.911,Breast cancer chemotherapy
+2023-04-15,,p3-maria-santos,26225,Ondansetron 8 MG Oral Tablet,T45.1X5A,Chemotherapy-induced nausea
+2023-04-15,,p3-maria-santos,3264,Dexamethasone 4 MG Oral Tablet,T45.1X5A,Pre-chemotherapy antiemetic
+2024-01-10,,p3-maria-santos,10324,Tamoxifen 20 MG Oral Tablet,C50.911,Hormone receptor positive breast cancer
+2023-10-05,,p3-maria-santos,6470,Lorazepam 0.5 MG Oral Tablet,F41.1,Anxiety related to cancer treatment

@@ -1,12 +1,13 @@
 import json
 import logging
+import time
 import uuid
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.agent.v0_loop import run_agent
+from app.agent.graph import run_graph
 from app.core.database import get_db
 from app.core.security import get_current_user_id
 from app.models.enums import MessageRole
@@ -38,7 +39,6 @@ async def send_message(
         first_message=payload.content,
     )
 
-    # Save the user message
     await service.save_message(
         thread_id=thread.id,
         caregiver_id=caregiver.id,
@@ -47,52 +47,58 @@ async def send_message(
         content=payload.content,
     )
 
-    # Run the agent loop
-    try:
-        agent_result = await run_agent(
-            care_recipient_id=care_recipient_id,
-            user_message=payload.content,
-            db=db,
-        )
-        reply_content = agent_result.content
-        tool_calls_log = agent_result.tool_calls_log
-        model_used = agent_result.model_used
-        tokens_input = agent_result.tokens_input
-        tokens_output = agent_result.tokens_output
-        latency_ms = agent_result.latency_ms
-    except Exception as e:
-        logger.exception("Agent loop failed: %s", e)
-        reply_content = (
-            "I'm sorry, I encountered an error processing your request. "
-            "Please try again or contact the care recipient's healthcare provider directly."
-        )
-        tool_calls_log = []
-        model_used = None
-        tokens_input = None
-        tokens_output = None
-        latency_ms = None
+    # Load prior messages for this thread to give the graph conversation history.
+    # Exclude the message just saved (the current user turn) so it isn't duplicated.
+    prior_messages = await service.list_messages(thread.id, caregiver.id)
+    history = [
+        {"role": m.role.value, "content": m.content}
+        for m in prior_messages[:-1]  # all but the just-saved user message
+        if m.role.value in ("user", "assistant") and m.content
+    ]
 
-    # Save the assistant message with full audit trail
-    await service.save_message(
-        thread_id=thread.id,
-        caregiver_id=caregiver.id,
-        care_recipient_id=care_recipient_id,
-        role=MessageRole.assistant,
-        content=reply_content,
-        tool_calls=tool_calls_log,
-        model_used=model_used,
-        tokens_input=tokens_input,
-        tokens_output=tokens_output,
-        latency_ms=latency_ms,
-    )
-
-    await db.commit()
-
-    # Stream the reply as SSE
     async def event_stream():
+        # Send thread_id immediately so the UI registers the thread
+        # and shows the typing indicator while the graph runs.
         yield f"data: {json.dumps({'thread_id': str(thread.id)})}\n\n"
 
-        # Stream word-by-word for a natural feel
+        reply_content = ""
+        tool_calls_log: list = []
+        latency_ms = None
+
+        try:
+            _start = time.monotonic()
+            final_state = await run_graph(
+                care_recipient_id=care_recipient_id,
+                user_message=payload.content,
+                db=db,
+                thread_id=payload.thread_id,
+                clerk_user_id=clerk_user_id,
+                history=history,
+            )
+            latency_ms = int((time.monotonic() - _start) * 1000)
+            reply_content = final_state.get("final_response") or "I'm unable to generate a response."
+            tool_calls_log = final_state.get("tools_called") or []
+        except Exception as e:
+            logger.exception("Agent graph failed: %s", e)
+            reply_content = (
+                "I'm sorry, I encountered an error processing your request. "
+                "Please try again or contact the care recipient's healthcare provider directly."
+            )
+
+        await service.save_message(
+            thread_id=thread.id,
+            caregiver_id=caregiver.id,
+            care_recipient_id=care_recipient_id,
+            role=MessageRole.assistant,
+            content=reply_content,
+            tool_calls=tool_calls_log,
+            model_used=None,
+            tokens_input=None,
+            tokens_output=None,
+            latency_ms=latency_ms,
+        )
+        await db.commit()
+
         words = reply_content.split(" ")
         for i, word in enumerate(words):
             token = word if i == 0 else " " + word
