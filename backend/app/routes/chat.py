@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import time
@@ -8,6 +9,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agent.graph import run_graph
+from app.agent.nodes.generator import register_stream, unregister_stream
 from app.core.database import get_db
 from app.core.security import get_current_user_id
 from app.models.enums import MessageRole
@@ -61,29 +63,66 @@ async def send_message(
         # and shows the typing indicator while the graph runs.
         yield f"data: {json.dumps({'thread_id': str(thread.id)})}\n\n"
 
-        reply_content = ""
+        stream_id = str(uuid.uuid4())
+        token_queue: asyncio.Queue[str | None] = asyncio.Queue()
+        register_stream(stream_id, token_queue)
+
+        final_state: dict = {}
         tool_calls_log: list = []
         latency_ms = None
+        _start = time.monotonic()
 
+        async def _run_graph() -> None:
+            nonlocal final_state, tool_calls_log, latency_ms
+            try:
+                result = await run_graph(
+                    care_recipient_id=care_recipient_id,
+                    user_message=payload.content,
+                    db=db,
+                    thread_id=payload.thread_id,
+                    clerk_user_id=clerk_user_id,
+                    history=history,
+                    stream_id=stream_id,
+                )
+                latency_ms = int((time.monotonic() - _start) * 1000)
+                final_state = result
+                tool_calls_log = result.get("tools_called") or []
+            except Exception as e:
+                logger.exception("Agent graph failed: %s", e)
+            finally:
+                # Always signal end of stream so the consumer loop below exits.
+                await token_queue.put(None)
+                unregister_stream(stream_id)
+
+        graph_task = asyncio.create_task(_run_graph())
+
+        # Forward tokens to the SSE stream as they arrive from the generator.
+        tokens_streamed = 0
         try:
-            _start = time.monotonic()
-            final_state = await run_graph(
-                care_recipient_id=care_recipient_id,
-                user_message=payload.content,
-                db=db,
-                thread_id=payload.thread_id,
-                clerk_user_id=clerk_user_id,
-                history=history,
-            )
-            latency_ms = int((time.monotonic() - _start) * 1000)
-            reply_content = final_state.get("final_response") or "I'm unable to generate a response."
-            tool_calls_log = final_state.get("tools_called") or []
-        except Exception as e:
-            logger.exception("Agent graph failed: %s", e)
-            reply_content = (
-                "I'm sorry, I encountered an error processing your request. "
-                "Please try again or contact the care recipient's healthcare provider directly."
-            )
+            while True:
+                token = await asyncio.wait_for(token_queue.get(), timeout=120.0)
+                if token is None:
+                    break
+                tokens_streamed += 1
+                yield f"data: {json.dumps({'token': token})}\n\n"
+        except asyncio.TimeoutError:
+            logger.warning("Token queue timed out for thread %s", thread.id)
+            graph_task.cancel()
+
+        await graph_task
+
+        reply_content = (
+            final_state.get("final_response")
+            or "I'm sorry, I encountered an error processing your request. "
+               "Please try again or contact the care recipient's healthcare provider directly."
+        )
+
+        # Fallback: if the generator never streamed (e.g. max-iterations hit or escalation
+        # path), push the final_response word-by-word so the frontend shows something.
+        if tokens_streamed == 0:
+            words = reply_content.split(" ")
+            for i, word in enumerate(words):
+                yield f"data: {json.dumps({'token': word if i == 0 else ' ' + word})}\n\n"
 
         await service.save_message(
             thread_id=thread.id,
@@ -98,11 +137,6 @@ async def send_message(
             latency_ms=latency_ms,
         )
         await db.commit()
-
-        words = reply_content.split(" ")
-        for i, word in enumerate(words):
-            token = word if i == 0 else " " + word
-            yield f"data: {json.dumps({'token': token})}\n\n"
 
         yield "data: [DONE]\n\n"
 

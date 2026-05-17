@@ -6,6 +6,7 @@ On regeneration, injects verifier issues as constraints.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import uuid
@@ -27,6 +28,18 @@ from app.providers.types import ChatResponse, Message, ToolDefinition, ToolFunct
 logger = logging.getLogger(__name__)
 
 MAX_TOOL_ITERATIONS = 10
+
+# Registry mapping stream_id → asyncio.Queue so the route can consume tokens
+# as the generator produces them.  Entries are added/removed by chat.py.
+_stream_queues: dict[str, asyncio.Queue] = {}
+
+
+def register_stream(stream_id: str, queue: asyncio.Queue) -> None:
+    _stream_queues[stream_id] = queue
+
+
+def unregister_stream(stream_id: str) -> None:
+    _stream_queues.pop(stream_id, None)
 _SYSTEM_PROMPT_PATH = Path(__file__).parent.parent / "prompts" / "v0_system.md"
 
 
@@ -140,6 +153,7 @@ async def generator_node(state: AgentState, db: AsyncSession) -> dict[str, Any]:
     seen_calls: set[str] = set()  # dedup key: "tool_name:args_json"
     provider = get_generator_provider()
     model = settings.generator_model_name
+    queue: asyncio.Queue | None = _stream_queues.get(state.get("stream_id", "") or "")
 
     try:
         for iteration in range(MAX_TOOL_ITERATIONS):
@@ -150,8 +164,16 @@ async def generator_node(state: AgentState, db: AsyncSession) -> dict[str, Any]:
             )
 
             if not response.tool_calls:
+                final_text = response.content or "I'm unable to generate a response."
+                if queue is not None:
+                    # Push already-fetched content word-by-word into the queue so
+                    # the SSE route streams to the frontend while the verifier runs.
+                    # No extra LLM call — reuses the response we already paid for.
+                    words = final_text.split(" ")
+                    for i, word in enumerate(words):
+                        await queue.put(word if i == 0 else " " + word)
                 return {
-                    "final_response": response.content or "I'm unable to generate a response.",
+                    "final_response": final_text,
                     "tools_called": all_tool_calls_log,
                 }
 

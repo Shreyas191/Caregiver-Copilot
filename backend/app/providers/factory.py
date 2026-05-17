@@ -19,12 +19,17 @@ def _is_openrouter(url: str) -> bool:
     return "openrouter.ai" in url
 
 
-def _make_provider(base_url: str, api_key: str) -> ModelProvider:
+def _make_provider(
+    base_url: str,
+    api_key: str,
+    fallback_models: list[str] | None = None,
+) -> ModelProvider:
     headers = _OPENROUTER_HEADERS if _is_openrouter(base_url) else {}
     return OpenAICompatibleProvider(
         base_url=base_url,
         api_key=api_key,
         default_headers=headers,
+        fallback_models=fallback_models if _is_openrouter(base_url) else None,
     )
 
 
@@ -35,12 +40,12 @@ def get_router_provider() -> ModelProvider:
 
 def get_generator_provider() -> ModelProvider:
     s = get_settings()
-    return _make_provider(s.generator_base_url, s.generator_api_key)
+    return _make_provider(s.generator_base_url, s.generator_api_key, s.generator_fallback_models)
 
 
 def get_verifier_provider() -> ModelProvider:
     s = get_settings()
-    return _make_provider(s.verifier_base_url, s.verifier_api_key)
+    return _make_provider(s.verifier_base_url, s.verifier_api_key, s.verifier_fallback_models)
 
 
 def get_embedding_provider() -> ModelProvider:

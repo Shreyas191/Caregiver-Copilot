@@ -105,11 +105,14 @@ async def run_graph(
     thread_id: uuid.UUID | None = None,
     clerk_user_id: str = "",
     history: list[dict[str, str]] | None = None,
+    stream_id: str | None = None,
 ) -> dict[str, Any]:
     """Invoke the compiled LangGraph and return the final state.
 
     history: prior user/assistant turns for this thread, oldest first.
     The current user_message is appended as the final entry.
+    stream_id: if set, generator/casual_handler nodes will push tokens into
+    the registered queue so the SSE route can forward them in real-time.
     """
     compiled = build_graph(db)
 
@@ -130,6 +133,7 @@ async def run_graph(
         "verifier_result": None,
         "regeneration_count": 0,
         "escalated": False,
+        "stream_id": stream_id,
     }
 
     config = {"configurable": {"thread_id": str(thread_id or uuid.uuid4())}}

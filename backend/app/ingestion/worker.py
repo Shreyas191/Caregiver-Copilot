@@ -117,10 +117,10 @@ async def run_once(db: AsyncSession) -> int:
     """Process all documents with status='uploaded'. Returns count processed."""
     result = await db.execute(
         text("""
-            SELECT id, care_recipient_id, type, file_name, storage_path
+            SELECT id, care_recipient_id, type, original_filename AS file_name, storage_path
             FROM documents
             WHERE status = 'uploaded'
-            ORDER BY created_at
+            ORDER BY uploaded_at
             LIMIT 20
         """)
     )

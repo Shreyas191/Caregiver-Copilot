@@ -15,8 +15,6 @@ from qdrant_client.models import (
     Filter,
     FieldCondition,
     MatchValue,
-    NamedVector,
-    NamedSparseVector,
     SparseVector,
 )
 
@@ -82,31 +80,35 @@ async def hybrid_search(
         vector = await embedder.embed_query(query)
         qdrant_filter = _build_filter(filter)
 
-        # Dense search
-        dense_hits = await client.search(
+        # Dense search using query_points (qdrant-client >= 1.7)
+        dense_result = await client.query_points(
             collection_name=collection,
-            query_vector=NamedVector(name="dense", vector=vector.dense),
+            query=vector.dense,
+            using="dense",
             query_filter=qdrant_filter,
             limit=top_k * 2,
             with_payload=True,
         )
+        dense_hits = dense_result.points
 
-        # Sparse search
-        sparse_vec = SparseVector(
-            indices=list(vector.sparse.keys()),
-            values=list(vector.sparse.values()),
-        )
+        # Sparse search — skip gracefully if index not populated
+        sparse_hits: list = []
         try:
-            sparse_hits = await client.search(
+            sparse_vec = SparseVector(
+                indices=list(vector.sparse.keys()),
+                values=list(vector.sparse.values()),
+            )
+            sparse_result = await client.query_points(
                 collection_name=collection,
-                query_vector=NamedSparseVector(name="sparse", vector=sparse_vec),
+                query=sparse_vec,
+                using="sparse",
                 query_filter=qdrant_filter,
                 limit=top_k * 2,
                 with_payload=True,
             )
+            sparse_hits = sparse_result.points
         except Exception:
-            # Sparse vector index may not be populated; fall back to dense only
-            sparse_hits = []
+            pass
 
         # Build (id, score) lists for RRF
         dense_ranked = [(str(h.id), h.score) for h in dense_hits]

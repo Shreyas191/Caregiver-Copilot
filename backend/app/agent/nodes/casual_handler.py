@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.agent.nodes.generator import _stream_queues
 from app.agent.state import AgentState
 from app.core.config import get_settings
 from app.providers.factory import get_router_provider
@@ -32,14 +33,17 @@ async def casual_handler_node(state: AgentState) -> dict[str, Any]:
             api_messages.append(Message(role=role, content=m.get("content", "")))
 
     provider = get_router_provider()
+    queue = _stream_queues.get(state.get("stream_id", "") or "")
     try:
         response = await provider.chat(
             messages=api_messages,
             model=settings.router_model_name,
         )
-        return {
-            "final_response": response.content or "How can I help you today?",
-            "tools_called": [],
-        }
+        final_text = response.content or "How can I help you today?"
+        if queue is not None:
+            words = final_text.split(" ")
+            for i, word in enumerate(words):
+                await queue.put(word if i == 0 else " " + word)
+        return {"final_response": final_text, "tools_called": []}
     finally:
         await provider.aclose()

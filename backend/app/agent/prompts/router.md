@@ -44,6 +44,18 @@ Message: "Is it okay to skip one dose of her blood pressure medicine?"
 Message: "Can you help me understand the care plan?"
 → { "intent": "casual_chat", "confidence": 0.80 }
 
+## Prior assistant message (context): I've drafted a message to Dr. Mitchell regarding Eleanor's bilateral ankle swelling. Would you like me to draft a message about any of her other concerns?
+Message: "yes"
+→ { "intent": "symptom_report", "confidence": 0.88 }
+
+## Prior assistant message (context): Based on Robert's stroke history, here are the key warning signs to watch for. Would you like me to create a care note?
+Message: "please do"
+→ { "intent": "symptom_report", "confidence": 0.90 }
+
+## Prior assistant message (context): I've logged the vital sign. Would you like me to also check for any medication interactions?
+Message: "sure"
+→ { "intent": "medication_question", "confidence": 0.85 }
+
 ## Instructions
 
 Classify the caregiver message and return:
@@ -52,3 +64,4 @@ Classify the caregiver message and return:
 
 When a message is ambiguous between vital_logging and symptom_report, prefer symptom_report.
 When in doubt, default to symptom_report (the clinical path) with lower confidence.
+**Important**: if a "Prior assistant message (context)" is shown above and the current message is a short confirmation or follow-up ("yes", "no", "sure", "ok", "please", "go ahead", etc.), classify it as a continuation of the clinical conversation — do NOT classify it as casual_chat.

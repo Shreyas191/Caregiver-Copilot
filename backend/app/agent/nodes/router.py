@@ -83,6 +83,23 @@ async def router_node(state: AgentState) -> dict[str, Any]:
             )
             intent_str = MessageIntent.symptom_report.value
 
+        # Guard: short messages in an ongoing conversation (prior assistant turn exists)
+        # are almost always follow-up confirmations, not casual greetings.
+        # Prevent routing them to casual_chat regardless of LLM confidence.
+        _CLEAR_GREETINGS = {"hi", "hello", "hey", "goodbye", "bye", "thanks", "thank you"}
+        if (
+            intent_str == MessageIntent.casual_chat.value
+            and context_block  # there is a prior assistant turn
+            and len(user_content.strip().split()) <= 5
+            and user_content.strip().lower() not in _CLEAR_GREETINGS
+        ):
+            logger.info(
+                "Short follow-up '%s' re-routed from casual_chat to symptom_report (prior context present)",
+                user_content.strip(),
+            )
+            intent_str = MessageIntent.symptom_report.value
+            confidence = 0.75
+
     except (json.JSONDecodeError, ValueError, AttributeError) as e:
         logger.warning("Router failed to parse response: %s", e)
         intent_str = MessageIntent.symptom_report.value

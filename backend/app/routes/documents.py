@@ -1,13 +1,16 @@
 """Document upload and retrieval routes (CC-037)."""
 
+import asyncio
+import logging
 import uuid
-from typing import Optional
 
+import httpx
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import get_db
+from app.core.config import get_settings
+from app.core.database import get_db, async_session_maker
 from app.core.security import get_current_user_id
 from app.models.caregiver import Caregiver
 from app.models.document import Document
@@ -18,6 +21,8 @@ from app.services.document_service import (
     get_download_url,
     upload_to_supabase,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/care-recipients", tags=["documents"])
 
@@ -83,6 +88,16 @@ async def upload_document(
 
     await db.commit()
 
+    # Kick off ingestion immediately in the background (don't wait for the polling worker)
+    doc_row = {
+        "id": doc.id,
+        "care_recipient_id": doc.care_recipient_id,
+        "type": doc.type.value,
+        "file_name": doc.original_filename,
+        "storage_path": doc.storage_path,
+    }
+    asyncio.create_task(_ingest_in_background(doc_row))
+
     return DocumentResponse(
         id=doc.id,
         care_recipient_id=doc.care_recipient_id,
@@ -93,6 +108,70 @@ async def upload_document(
         download_url=get_download_url(doc.storage_path),
         uploaded_at=doc.uploaded_at,
     )
+
+
+async def _ingest_in_background(doc_row: dict) -> None:
+    """Run the full ingestion pipeline for a single document in a fresh DB session."""
+    from app.ingestion.worker import process_document
+
+    try:
+        async with async_session_maker() as db:
+            await process_document(doc_row, db)
+    except Exception:
+        logger.exception("Background ingestion failed for document %s", doc_row.get("id"))
+
+
+@router.get("/{care_recipient_id}/documents/{document_id}/download")
+async def download_document(
+    care_recipient_id: uuid.UUID,
+    document_id: uuid.UUID,
+    clerk_user_id: str = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """Generate a short-lived signed URL and return it as JSON."""
+    row = await db.execute(
+        select(Document).where(
+            Document.id == document_id,
+            Document.care_recipient_id == care_recipient_id,
+        )
+    )
+    doc = row.scalar_one_or_none()
+    if doc is None:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    settings = get_settings()
+    if not settings.supabase_url or doc.storage_path.startswith("local/"):
+        raise HTTPException(status_code=404, detail="File not available")
+
+    bucket = settings.supabase_storage_bucket
+    sign_url = f"{settings.supabase_url}/storage/v1/object/sign/{bucket}/{doc.storage_path}"
+
+    async with httpx.AsyncClient() as client:
+        resp = await client.post(
+            sign_url,
+            json={"expiresIn": 3600},
+            headers={
+                "Authorization": f"Bearer {settings.supabase_service_role_key}",
+                "Content-Type": "application/json",
+            },
+        )
+
+    if resp.status_code != 200:
+        raise HTTPException(status_code=502, detail="Could not generate download link")
+
+    signed_path = resp.json().get("signedURL") or resp.json().get("signedUrl", "")
+    if not signed_path:
+        raise HTTPException(status_code=502, detail="Empty signed URL from Supabase")
+
+    # Supabase returns a relative path like /object/sign/...?token=...
+    # The storage REST API lives under /storage/v1, so we must prepend that.
+    if signed_path.startswith("http"):
+        full_url = signed_path
+    elif signed_path.startswith("/object/"):
+        full_url = f"{settings.supabase_url}/storage/v1{signed_path}"
+    else:
+        full_url = f"{settings.supabase_url}{signed_path}"
+    return {"url": full_url}
 
 
 @router.get("/{care_recipient_id}/documents", response_model=list[DocumentResponse])

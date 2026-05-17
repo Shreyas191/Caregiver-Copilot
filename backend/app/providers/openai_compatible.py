@@ -25,7 +25,8 @@ from app.providers.types import (
 logger = logging.getLogger(__name__)
 
 _RETRY_STATUSES = {429, 500, 502, 503, 504}
-_RETRY_DELAY = 2.0
+_MAX_ATTEMPTS = 4
+_BASE_DELAY = 1.0
 
 
 class OpenAICompatibleProvider(ModelProvider):
@@ -34,6 +35,9 @@ class OpenAICompatibleProvider(ModelProvider):
 
     Pass base_url pointing to the /v1 prefix (e.g. "http://localhost:11434/v1"
     for Ollama, "https://openrouter.ai/api/v1" for OpenRouter).
+
+    fallback_models: tried in order via OpenRouter's `models` array when the
+    primary model is rate-limited. Ignored for non-OpenRouter endpoints.
     """
 
     def __init__(
@@ -42,6 +46,7 @@ class OpenAICompatibleProvider(ModelProvider):
         api_key: str,
         default_headers: dict[str, str] | None = None,
         timeout: float = 120.0,
+        fallback_models: list[str] | None = None,
     ):
         self._client = AsyncOpenAI(
             base_url=base_url,
@@ -49,40 +54,53 @@ class OpenAICompatibleProvider(ModelProvider):
             default_headers=default_headers or {},
             timeout=timeout,
         )
+        self._fallback_models = fallback_models or []
 
     # ------------------------------------------------------------------
-    # Retry helper
+    # Retry helper — exponential backoff, up to _MAX_ATTEMPTS
     # ------------------------------------------------------------------
 
     @staticmethod
     def _retry_after(e: openai.APIStatusError) -> float:
-        """Extract Retry-After seconds from the response headers, fallback to default."""
         try:
             header = e.response.headers.get("retry-after") or e.response.headers.get("Retry-After")
             if header:
                 return float(header)
         except Exception:
             pass
-        return _RETRY_DELAY
+        return _BASE_DELAY
 
-    async def _retry_once(self, coro_fn, delay: float = _RETRY_DELAY):
-        """Run coro_fn(); on 429 / 5xx retry once, honouring Retry-After if present."""
-        try:
-            return await coro_fn()
-        except openai.RateLimitError as e:
-            wait = self._retry_after(e)
-            logger.warning("Rate-limited by provider (429); retrying in %.1fs — %s", wait, e)
-            await asyncio.sleep(wait)
-            return await coro_fn()
-        except openai.APIStatusError as e:
-            if e.status_code in _RETRY_STATUSES:
-                wait = self._retry_after(e)
+    async def _with_backoff(self, coro_fn):
+        """Exponential backoff: 1s → 2s → 4s across up to _MAX_ATTEMPTS attempts."""
+        delay = _BASE_DELAY
+        for attempt in range(_MAX_ATTEMPTS):
+            try:
+                return await coro_fn()
+            except openai.RateLimitError as e:
+                if attempt == _MAX_ATTEMPTS - 1:
+                    raise
+                wait = max(self._retry_after(e), delay)
                 logger.warning(
-                    "Provider returned %d; retrying in %.1fs — %s", e.status_code, wait, e
+                    "Rate-limited (attempt %d/%d); retrying in %.1fs", attempt + 1, _MAX_ATTEMPTS, wait
                 )
                 await asyncio.sleep(wait)
-                return await coro_fn()
-            raise
+                delay *= 2
+            except openai.APIStatusError as e:
+                if e.status_code not in _RETRY_STATUSES or attempt == _MAX_ATTEMPTS - 1:
+                    raise
+                wait = max(self._retry_after(e), delay)
+                logger.warning(
+                    "Provider %d (attempt %d/%d); retrying in %.1fs", e.status_code, attempt + 1, _MAX_ATTEMPTS, wait
+                )
+                await asyncio.sleep(wait)
+                delay *= 2
+
+    def _models_extra(self, model: str) -> dict:
+        """Build extra_body with OpenRouter fallback models array if configured.
+        OpenRouter caps the models array at 3 items."""
+        if not self._fallback_models:
+            return {}
+        return {"models": ([model] + self._fallback_models)[:3]}
 
     # ------------------------------------------------------------------
     # Message serialisation
@@ -153,14 +171,17 @@ class OpenAICompatibleProvider(ModelProvider):
     # ------------------------------------------------------------------
 
     async def chat(self, messages: list[Message], model: str, **kwargs) -> ChatResponse:
+        extra = self._models_extra(model)
+
         async def _call():
             return await self._client.chat.completions.create(
                 model=model,
                 messages=self._to_api_messages(messages),
+                extra_body=extra or None,
                 **kwargs,
             )
 
-        response = await self._retry_once(_call)
+        response = await self._with_backoff(_call)
         choice = response.choices[0]
         usage = response.usage
         return ChatResponse(
@@ -187,16 +208,18 @@ class OpenAICompatibleProvider(ModelProvider):
     ) -> ChatResponse:
         api_tools = [t.model_dump() for t in tools]
         api_messages = self._to_api_messages(messages)
+        extra = self._models_extra(model)
 
         async def _call():
             return await self._client.chat.completions.create(
                 model=model,
                 messages=api_messages,
                 tools=api_tools,
+                extra_body=extra or None,
                 **kwargs,
             )
 
-        response = await self._retry_once(_call)
+        response = await self._with_backoff(_call)
         choice = response.choices[0]
         tool_calls, all_valid = self._parse_sdk_tool_calls(choice.message.tool_calls)
 
@@ -217,10 +240,11 @@ class OpenAICompatibleProvider(ModelProvider):
                     model=model,
                     messages=retry_messages,
                     tools=api_tools,
+                    extra_body=extra or None,
                     **kwargs,
                 )
 
-            retry_response = await self._retry_once(_retry_call)
+            retry_response = await self._with_backoff(_retry_call)
             retry_choice = retry_response.choices[0]
             tool_calls, _ = self._parse_sdk_tool_calls(retry_choice.message.tool_calls)
             choice = retry_choice
@@ -245,10 +269,12 @@ class OpenAICompatibleProvider(ModelProvider):
     async def chat_stream(
         self, messages: list[Message], model: str, **kwargs
     ) -> AsyncIterator[str]:
+        extra = self._models_extra(model)
         stream = await self._client.chat.completions.create(
             model=model,
             messages=self._to_api_messages(messages),
             stream=True,
+            extra_body=extra or None,
             **kwargs,
         )
         async for chunk in stream:
@@ -263,7 +289,7 @@ class OpenAICompatibleProvider(ModelProvider):
         async def _call():
             return await self._client.embeddings.create(model=model, input=texts)
 
-        response = await self._retry_once(_call)
+        response = await self._with_backoff(_call)
         return [d.embedding for d in response.data]
 
     # ------------------------------------------------------------------

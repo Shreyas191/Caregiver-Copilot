@@ -43,11 +43,20 @@ class Settings(BaseSettings):
     generator_base_url: str = "https://openrouter.ai/api/v1"
     generator_api_key: str = ""
     generator_model_name: str = "z-ai/glm-4.5-air:free"
+    # Fallback models tried in order when generator is rate-limited
+    generator_fallback_models: list[str] = [
+        "qwen/qwen3-8b:free",
+        "meta-llama/llama-3.1-8b-instruct:free",
+    ]
 
     # Verifier: structured judgment — Llama-3.3-70B via OpenRouter free tier
     verifier_base_url: str = "https://openrouter.ai/api/v1"
     verifier_api_key: str = ""
     verifier_model_name: str = "meta-llama/llama-3.3-70b-instruct:free"
+    verifier_fallback_models: list[str] = [
+        "qwen/qwen3-8b:free",
+        "meta-llama/llama-3.1-8b-instruct:free",
+    ]
 
     # Embeddings: BGE-M3 dense vectors — local Ollama
     embedding_base_url: str = "http://localhost:11434/v1"

@@ -41,3 +41,6 @@ class AgentState(TypedDict, total=False):
 
     # Error / escalation flag
     escalated: bool
+
+    # Optional stream ID used to route tokens to the SSE response queue
+    stream_id: Optional[str]

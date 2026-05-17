@@ -101,7 +101,12 @@ async def _set_status(
 ) -> None:
     from sqlalchemy import text
 
-    if error_msg:
+    if status == "indexed":
+        await db.execute(
+            text("UPDATE documents SET status = :s, indexed_at = NOW() WHERE id = :id"),
+            {"s": status, "id": document_id},
+        )
+    elif error_msg:
         await db.execute(
             text("UPDATE documents SET status = :s, processing_error = :e WHERE id = :id"),
             {"s": status, "e": error_msg[:500], "id": document_id},

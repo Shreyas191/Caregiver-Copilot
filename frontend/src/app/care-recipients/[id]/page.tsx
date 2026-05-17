@@ -21,6 +21,7 @@ import { MedicationsList } from '@/components/care-recipient/MedicationsList';
 import { VitalsList } from '@/components/care-recipient/VitalsList';
 import { EpisodesList } from '@/components/care-recipient/EpisodesList';
 import { MedicationForm } from '@/components/medications/MedicationForm';
+import { UploadButton } from '@/components/documents/UploadButton';
 
 export default function CareRecipientProfilePage() {
   const { id } = useParams<{ id: string }>();
@@ -30,8 +31,21 @@ export default function CareRecipientProfilePage() {
   const [medications, setMedications] = useState<any[]>([]);
   const [vitals, setVitals] = useState<any[]>([]);
   const [episodes, setEpisodes] = useState<any[]>([]);
+  const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [medDialogOpen, setMedDialogOpen] = useState(false);
+
+  const fetchDocuments = useCallback(async () => {
+    const token = await getToken();
+    if (!token || !id) return;
+    const base = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000') + '/api/v1';
+    try {
+      const res = await fetch(`${base}/care-recipients/${id}/documents`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) setDocuments(await res.json());
+    } catch { /* non-critical */ }
+  }, [getToken, id]);
 
   const fetchAll = useCallback(async () => {
     const token = await getToken();
@@ -50,8 +64,8 @@ export default function CareRecipientProfilePage() {
 
   useEffect(() => {
     setLoading(true);
-    fetchAll().finally(() => setLoading(false));
-  }, [fetchAll]);
+    Promise.all([fetchAll(), fetchDocuments()]).finally(() => setLoading(false));
+  }, [fetchAll, fetchDocuments]);
 
   if (loading) {
     return (
@@ -106,6 +120,7 @@ export default function CareRecipientProfilePage() {
             </TabsTrigger>
             <TabsTrigger value="vitals">Recent Vitals</TabsTrigger>
             <TabsTrigger value="episodes">Episodes</TabsTrigger>
+            <TabsTrigger value="documents">Documents</TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile">
@@ -138,6 +153,63 @@ export default function CareRecipientProfilePage() {
 
           <TabsContent value="episodes">
             <EpisodesList episodes={episodes} />
+          </TabsContent>
+
+          <TabsContent value="documents">
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-base font-semibold text-gray-900">Clinical Documents</h2>
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    Upload lab reports, discharge summaries, or after-visit notes (PDF or image).
+                    The assistant can answer questions about uploaded documents.
+                  </p>
+                </div>
+                <UploadButton careRecipientId={id} onUploadComplete={fetchDocuments} />
+              </div>
+
+              {documents.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-8">
+                  No documents uploaded yet.
+                </p>
+              ) : (
+                <ul className="divide-y divide-gray-100">
+                  {documents.map((doc) => (
+                    <li key={doc.id} className="flex items-center justify-between py-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {doc.original_filename}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {doc.document_type} · {(doc.file_size_bytes / 1024).toFixed(0)} KB ·{' '}
+                          <span className={`capitalize ${doc.status === 'indexed' ? 'text-green-600' : doc.status === 'failed' ? 'text-red-500' : 'text-yellow-600'}`}>
+                            {doc.status}
+                          </span>
+                          {' · '}{new Date(doc.uploaded_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <button
+                        onClick={async () => {
+                          const token = await getToken();
+                          const base = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+                          const res = await fetch(
+                            `${base}/api/v1/care-recipients/${id}/documents/${doc.id}/download`,
+                            { headers: { Authorization: `Bearer ${token}` } },
+                          );
+                          if (res.ok) {
+                            const { url } = await res.json();
+                            window.open(url, '_blank');
+                          }
+                        }}
+                        className="ml-4 text-xs text-blue-600 hover:underline shrink-0"
+                      >
+                        View
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </TabsContent>
         </Tabs>
       </main>

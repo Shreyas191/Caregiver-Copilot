@@ -3,6 +3,8 @@
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
+import { useAuth } from "@clerk/nextjs";
+
 interface UploadButtonProps {
   careRecipientId: string;
   onUploadComplete?: () => void;
@@ -12,6 +14,7 @@ export function UploadButton({ careRecipientId, onUploadComplete }: UploadButton
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState<string | null>(null);
+  const { getToken } = useAuth();
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -21,6 +24,7 @@ export function UploadButton({ careRecipientId, onUploadComplete }: UploadButton
     setUploading(true);
     setProgress("Uploading…");
 
+    const token = await getToken();
     const formData = new FormData();
     formData.append("file", file);
     formData.append("document_type", "other");
@@ -28,7 +32,11 @@ export function UploadButton({ careRecipientId, onUploadComplete }: UploadButton
     try {
       const res = await fetch(
         `${apiUrl}/api/v1/care-recipients/${careRecipientId}/documents`,
-        { method: "POST", body: formData }
+        {
+          method: "POST",
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          body: formData,
+        }
       );
 
       if (res.ok) {
